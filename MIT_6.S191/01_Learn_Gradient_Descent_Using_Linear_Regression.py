@@ -1,6 +1,6 @@
 import marimo
 
-__generated_with = "0.11.0"
+__generated_with = "0.11.5"
 app = marimo.App(
     width="medium",
     app_title="Learn Gradient Descent From Scratch Using Linear Regression",
@@ -373,15 +373,15 @@ app._unparsable_cell(
 )
 
 
-app._unparsable_cell(
-    r"""
+@app.cell
+def _():
     import marimo as mo
-    import pandas as pddf = pd.read_csv(\"Zomato-data-.csv\")
-    df.head()df = pd.read_csv(\"Wine-Quality.csv\")
+    import pandas as pd
+    df = pd.read_csv("Zomato-data-.csv")
     df.head()
-    """,
-    name="_"
-)
+    df = pd.read_csv("Wine-Quality.csv")
+    df.head()
+    return df, mo, pd
 
 
 app._unparsable_cell(

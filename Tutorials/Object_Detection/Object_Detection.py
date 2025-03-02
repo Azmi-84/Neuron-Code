@@ -1,7 +1,7 @@
 import marimo
 
-__generated_with = "0.11.0"
-app = marimo.App(auto_download=["html"])
+__generated_with = "0.11.5"
+app = marimo.App(width="medium", auto_download=["html"])
 
 
 @app.cell
@@ -40,25 +40,17 @@ def _(nn, torch):
 
 @app.cell
 def _(DQN, nn, torch):
-    class DQN_1(nn.Module):
-        """DQN with three fully connected layers and ReLU activations."""
+    # Corrected DQN class (removed redundant DQN_1 and fixed super call)
+    class DQNAgentModel(DQN):
+        """Inherits from DQN for consistency."""
 
-        def __init__(self, state_size, action_size):
-            super(DQN, self).__init__()
-            self.fc1 = nn.Linear(state_size, 128)
-            self.fc2 = nn.Linear(128, 128)
-            self.fc3 = nn.Linear(128, action_size)
+        pass
 
-        def forward(self, x):
-            x = torch.relu(self.fc1(x))
-            x = torch.relu(self.fc2(x))
-            return self.fc3(x)
-
-    return (DQN_1,)
+    return (DQNAgentModel,)
 
 
 @app.cell
-def _(DQN_1, deque, nn, np, optim, random, torch):
+def _(DQNAgentModel, deque, nn, np, optim, random, torch):
     class DQNAgent:
         """DQN Agent with experience replay and target network for stability."""
 
@@ -71,8 +63,8 @@ def _(DQN_1, deque, nn, np, optim, random, torch):
             self.epsilon_min = 0.01
             self.epsilon_decay = 0.995
             self.learning_rate = 0.001
-            self.model = DQN_1(state_size, action_size)
-            self.target_model = DQN_1(state_size, action_size)
+            self.model = DQNAgentModel(state_size, action_size)
+            self.target_model = DQNAgentModel(state_size, action_size)
             self.target_model.load_state_dict(self.model.state_dict())
             self.optimizer = optim.Adam(self.model.parameters(), lr=self.learning_rate)
             self.confidence_threshold = init_confidence
@@ -111,8 +103,8 @@ def _(DQN_1, deque, nn, np, optim, random, torch):
             loss.backward()
             self.optimizer.step()
             if self.epsilon > self.epsilon_min:
-                self.epsilon = self.epsilon * self.epsilon_decay
-            self.step_count = self.step_count + 1
+                self.epsilon *= self.epsilon_decay
+            self.step_count += 1
             if self.step_count % self.update_target_every == 0:
                 self.target_model.load_state_dict(self.model.state_dict())
 
@@ -123,27 +115,23 @@ def _(DQN_1, deque, nn, np, optim, random, torch):
 def _(torch):
     # Initialize Object Detection Model (YOLOv5 on CPU)
     device = torch.device("cpu")
-    # Load YOLOv5s model (smallest variant for CPU efficiency)
     model = torch.hub.load("ultralytics/yolov5", "yolov5s", pretrained=True)
     model.to(device)
     model.eval()
-    default_confidence = 0.5  # Initial confidence threshold
+    default_confidence = 0.5
     return default_confidence, device, model
 
 
 @app.cell
 def _(cv2, model, np):
-    # Utility Functions
     def calculate_frame_variation(prev_frame, current_frame):
-        """Calculate mean absolute difference between consecutive frames."""
         if prev_frame is None:
             return 0
         diff = cv2.absdiff(prev_frame, current_frame)
-        return np.mean(diff) / 255.0  # Normalize to [0,1]
+        return np.mean(diff) / 255.0
 
     def update_detector_confidence(threshold):
-        """Update YOLOv5's confidence threshold dynamically."""
-        model.conf = max(0.1, min(0.9, threshold))  # Clamp between 0.1-0.9
+        model.conf = max(0.1, min(0.9, threshold))
 
     return calculate_frame_variation, update_detector_confidence
 
@@ -189,6 +177,7 @@ def _(
     prev_gray,
     prev_state,
     time,
+    update_detector_confidence,
 ):
     while True:
         ret, frame = cap.read()
@@ -198,7 +187,7 @@ def _(
         rgb_frame = cv2.cvtColor(resized_frame, cv2.COLOR_BGR2RGB)
         current_gray = cv2.cvtColor(resized_frame, cv2.COLOR_BGR2GRAY)
         frame_variation = calculate_frame_variation(prev_gray, current_gray)
-        prev_gray_1 = current_gray
+        prev_gray = current_gray  # Update previous frame
         results = model(rgb_frame)
         detections = results.pandas().xyxy[0]
         valid_detections = detections[
@@ -207,32 +196,33 @@ def _(
         total_detections = len(valid_detections)
         max_expected_detections = 50
         normalized_detections = total_detections / max_expected_detections
-        normalized_variation = frame_variation
         current_state = [
             normalized_detections,
             agent.confidence_threshold,
-            normalized_variation,
+            frame_variation,
         ]
         if prev_state is not None:
-            target_min, target_max = (5, 15)
+            target_min, target_max = 5, 15
             if total_detections < target_min:
                 reward = -(target_min - total_detections) / target_min
             elif total_detections > target_max:
                 reward = -(total_detections - target_max) / target_max
             else:
                 reward = 1.0
-            _episode_reward = _episode_reward + reward
+            _episode_reward += reward
             agent.remember(prev_state, prev_action, reward, current_state, False)
             agent.replay(batch_size)
         action = agent.choose_action(current_state)
         step_size = 0.05
-        if action == 0:
-            new_conf = agent.confidence_threshold + step_size
-        else:
-            new_conf = agent.confidence_threshold - step_size
+        new_conf = agent.confidence_threshold + (
+            step_size if action == 0 else -step_size
+        )
         agent.confidence_threshold = max(0.1, min(0.9, new_conf))
-        prev_state_1 = current_state
-        prev_action_1 = action
+        update_detector_confidence(
+            agent.confidence_threshold
+        )  # Update model confidence
+        prev_state = current_state  # Update state for next iteration
+        prev_action = action
         for _, det in valid_detections.iterrows():
             x1, y1, x2, y2 = map(int, det[["xmin", "ymin", "xmax", "ymax"]])
             cv2.rectangle(resized_frame, (x1, y1), (x2, y2), (0, 255, 0), 2)
@@ -263,14 +253,13 @@ def _(
                 (0, 255, 255),
                 2,
             )
-            y_offset = y_offset + 30
-        _frame_count = _frame_count + 1
-        if time.time() - fps_start_time >= 1:
-            fps = _frame_count / (time.time() - fps_start_time)
-            fps_start_time_1 = time.time()
+            y_offset += 30
+        _frame_count += 1
+        current_time = time.time()
+        if current_time - fps_start_time >= 1:
+            fps = _frame_count / (current_time - fps_start_time)
+            fps_start_time = current_time
             _frame_count = 0
-        else:
-            fps = 0
         cv2.putText(
             resized_frame,
             f"FPS: {fps:.1f}",
@@ -285,42 +274,7 @@ def _(
             break
     cap.release()
     cv2.destroyAllWindows()
-    return (
-        action,
-        current_gray,
-        current_state,
-        det,
-        detections,
-        fps,
-        fps_start_time_1,
-        frame,
-        frame_variation,
-        info_lines,
-        label,
-        line,
-        max_expected_detections,
-        new_conf,
-        normalized_detections,
-        normalized_variation,
-        prev_action_1,
-        prev_gray_1,
-        prev_state_1,
-        resized_frame,
-        results,
-        ret,
-        reward,
-        rgb_frame,
-        step_size,
-        target_max,
-        target_min,
-        total_detections,
-        valid_detections,
-        x1,
-        x2,
-        y1,
-        y2,
-        y_offset,
-    )
+    return
 
 
 if __name__ == "__main__":
