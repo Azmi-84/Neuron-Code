@@ -5,7 +5,10 @@
 // 1. Call by value
 // 2. Call by reference
 
-// Function to determine student category based on ID
+/**
+ * Function to determine student category based on ID
+ * Uses the 7th, 8th, and 9th digits of the ID for categorization
+ */
 void getStudentID(int arr[9], int len)
 {
     int k = arr[6];               // Extracts 7th digit from the array
@@ -30,7 +33,10 @@ void getStudentID(int arr[9], int len)
     }
 }
 
-// Function to print a pattern (implementation commented out)
+/**
+ * Function to print various patterns
+ * Currently contains example implementations in comments
+ */
 void pattern()
 {
     // Example: Uncomment and modify based on required pattern
@@ -58,6 +64,7 @@ void pattern()
 
 int main()
 {
+    // ========== ELIGIBILITY CHECK SECTION ==========
     int math = 0, phy = 0, chem = 0;
 
     // Taking user input for marks (currently commented out)
@@ -78,6 +85,7 @@ int main()
         // printf("Not eligible\n");
     }
 
+    // ========== STUDENT ID PROCESSING SECTION ==========
     int arr[9];
     // printf("Enter 9 Student IDs (space-separated): ");
     for (int i = 0; i < 9; i++)
@@ -94,6 +102,7 @@ int main()
 
     getStudentID(arr, len); // Call function to process student IDs
 
+    // ========== PATTERN PRINTING SECTION (COMMENTED) ==========
     // int rows = 0;
     // scanf("%d", &rows);
     // pattern(rows); // Call pattern function with rows
@@ -102,21 +111,106 @@ int main()
     // scanf("%c", &input);
     // pattern(input); // Call pattern function with character input
 
-    int num, sum = 0;
+    // ========== SUM CALCULATION SECTION (COMMENTED) ==========
+    // int num, sum = 0;
 
-    while (1)
-    {
-        // printf("Enter a number (enter 0 to stop): ");
-        // scanf("%d", &num);
+    // while (1)
+    // {
+    //     // printf("Enter a number (enter 0 to stop): ");
+    //     // scanf("%d", &num);
 
-        if (num == 0)
-        {
-            break;
-        }
-        sum += num;
-    }
+    //     if (num == 0)
+    //     {
+    //         break;
+    //     }
+    //     sum += num;
+    // }
 
     // printf("\nTotal sum of the numbers entered: %d\n", sum);
+
+    // ========== FIND SMALLEST ELEMENTS SECTION (COMMENTED) ==========
+    // int new_array[20];
+
+    // int i = 0;
+    // printf("Array element: ");
+    // for (i = 0; i < 10; i++)
+    // {
+    //     scanf("%d", &new_array[i]);
+    // }
+
+    // int small = new_array[0];
+    // int index = 0;
+
+    // for (i = 1; i < 10; i++)
+    // {
+    //     if (new_array[i] < small)
+    //     {
+    //         small = new_array[i];
+    //         index = i;
+    //     }
+    // }
+    // printf("Smallest element: %d  | Index: %d\n", small, index);
+
+    // int second_small = new_array[0];
+
+    // if (index == 0)
+    // {
+    //     second_small = new_array[1];
+    // }
+
+    // for (i = 0; i < 10; i++)
+    // {
+    //     if (i == index)
+    //     {
+    //         continue;
+    //     }
+
+    //     if (new_array[i] < second_small)
+    //     {
+    //         second_small = new_array[i];
+    //     }
+    // }
+
+    // printf("Second smallest element: %d\n", second_small);
+
+    // ========== FREQUENCY COUNTING SECTION ==========
+    int n_arr[20];
+
+    printf("Enter 10 integers: ");
+    for (int i = 0; i < 10; i++)
+    {
+        scanf("%d", &n_arr[i]);
+    }
+
+    for (int i = 0; i < 10; i++)
+    {
+        // This code checks if we've already processed this number before
+        int counted = 0;
+        for (int j = 0; j < i; j++)
+        {
+            if (n_arr[i] == n_arr[j])
+            {
+                counted = 1; // We found this number earlier in the array
+                break;
+            }
+        }
+        if (counted == 1)
+        {
+            continue; // Skip this number as we've already counted its frequency
+        }
+
+        int freq = 1;
+
+        for (int k = i + 1; k < 10; k++)
+        {
+            if (n_arr[i] == n_arr[k])
+            {
+                freq++;
+            }
+        }
+
+        printf("Num: %d || Freq: %d\n", n_arr[i], freq);
+    }
 
     return 0;
 }
