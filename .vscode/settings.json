@@ -59,5 +59,14 @@
   "C_Cpp_Runner.showCompilationTime": false,
   "C_Cpp_Runner.useLinkTimeOptimization": false,
   "C_Cpp_Runner.msvcSecureNoWarnings": false,
-  "github.copilot.chat.scopeSelection": true
+  "github.copilot.chat.scopeSelection": true,
+  "github.copilot.chat.agent.runTasks": true,
+  "github.copilot.chat.commitMessageGeneration.instructions": [
+    {
+      "file": ".copilot-commit-message-instructions.md"
+    },
+    {
+      "text": "Generate extremely detailed commit messages that explain the purpose, impact, and context of changes. Use proper style and give them in points. Include appropriate emojis based on the type of change."
+    }
+  ]
 }
