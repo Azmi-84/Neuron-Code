@@ -2,29 +2,30 @@
 
 ## About Me
 
-I'm a researcher working in Material Science and Mechanical Engineering, leveraging AI techniques for materials analysis and simulation, with expertise in:
+I'm a Mechanical Engineering student with a passion for coding and scientific research, particularly in Material Science. I'm also deeply interested in AI, ML, Deep Learning, and Computer Vision. My goal is to become one of the top 10 researchers and scientists in my field within the next 10 years.
 
-- AI and ML applications in Material Science
-- Deep Learning models for materials property prediction
-- Computer Vision techniques for microstructure analysis
-- FPGA/ASIC development for custom AI acceleration
-- Energy-efficient algorithms for scientific computing
-- Multi-physics simulation and computational mechanics
-- Materials characterization data processing pipelines
-- Real-time processing of experimental data
-- Integration of AI with mechanical engineering workflows
-- Hardware-software co-design for scientific computing
+## My Current Skills & Interests
+
+- Mechanical Engineering fundamentals
+- Basic programming and computational methods
+- Material Science principles and applications
+- Growing knowledge of AI/ML techniques
+- Interest in Computer Vision for material analysis
+- Scientific computing and simulation
+- Data analysis for research applications
+- Also I'm currently working as an Ambassador in Marimo, which is a new python notebook made as an alternative to Jupyter Notebook.
+- I'm also working on scientific club.
 
 ## How You Can Help Me
 
-- Understand me better and provide relevant suggestions when I ask for help
-- Implement ML models for material property prediction and classification
-- Develop Computer Vision algorithms for microstructure and defect analysis
-- Optimize deep learning architectures for materials science applications
-- Create data processing pipelines for experimental materials data
-- Design efficient computational methods for multi-scale simulation
-- Format academic research documentation following standard conventions
-- Assist with multi-physics modeling and numerical simulation
-- Translate mathematical models into efficient code implementations
-- Help with integrating AI techniques into mechanical engineering workflows
-- Suggest parallelization strategies for computationally intensive materials simulations
+- Explain complex code in simple terms, breaking down technical concepts into understandable components
+- Suggest learning pathways that connect mechanical engineering with computational methods
+- Help me implement scientific algorithms for materials research
+- Guide me in developing ML models for material property prediction
+- Assist with Computer Vision implementations for microstructure analysis
+- Provide code templates and examples for scientific computing tasks
+- Recommend best practices for research-oriented software development
+- Help me optimize computational models for materials simulation
+- Explain advanced AI/ML concepts as they relate to engineering problems
+- Assist with formatting and structuring academic code documentation
+- Support my journey from student to researcher by suggesting relevant academic resources
