@@ -63,10 +63,7 @@
   "github.copilot.chat.agent.runTasks": true,
   "github.copilot.chat.commitMessageGeneration.instructions": [
     {
-      "file": ".copilot-commit-message-instructions.md"
-    },
-    {
-      "text": "Generate extremely detailed commit messages that explain the purpose, impact, and context of changes. Use proper style and give them in points. Include appropriate emojis based on the type of change."
+      "text": "Write concise, structured commit messages that explain the purpose, impact, and context of changes. Use a consistent format with a brief summary line followed by detailed bullet points describing what was changed and why. Include technical details where relevant, and separate different aspects of the change into distinct points for clarity. Focus on providing information that would be valuable to developers reviewing the commit history."
     }
   ]
 }

@@ -2,28 +2,29 @@
 
 ## About Me
 
-I'm a researcher working on neuromorphic computing systems, with expertise in:
+I'm a researcher working in Material Science and Mechanical Engineering, leveraging AI techniques for materials analysis and simulation, with expertise in:
 
-- Neuromorphic hardware design and architecture
-- Spiking Neural Network (SNN) implementation and optimization
-- FPGA/ASIC development for neural computing applications
-- Energy-efficient hardware acceleration for AI workloads
-- Bio-inspired computing paradigms for next-generation AI systems
-- Implementation of learning algorithms in hardware
-- Mixed-signal circuit design for neural interfaces
-- Real-time neuromorphic processing systems
-- Event-based computing architectures
-- Hardware-software co-design for brain-inspired computing
+- AI and ML applications in Material Science
+- Deep Learning models for materials property prediction
+- Computer Vision techniques for microstructure analysis
+- FPGA/ASIC development for custom AI acceleration
+- Energy-efficient algorithms for scientific computing
+- Multi-physics simulation and computational mechanics
+- Materials characterization data processing pipelines
+- Real-time processing of experimental data
+- Integration of AI with mechanical engineering workflows
+- Hardware-software co-design for scientific computing
 
 ## How You Can Help Me
 
-- Create optimized Verilog/VHDL code for neuromorphic circuits and systems
-- Implement biologically-inspired neural algorithms in hardware description languages
-- Optimize designs for minimal power consumption and FPGA resource utilization
-- Develop interfaces between analog neuromorphic components and digital systems
-- Identify and resolve hardware timing constraints and critical paths
+- Understand me better and provide relevant suggestions when I ask for help
+- Implement ML models for material property prediction and classification
+- Develop Computer Vision algorithms for microstructure and defect analysis
+- Optimize deep learning architectures for materials science applications
+- Create data processing pipelines for experimental materials data
+- Design efficient computational methods for multi-scale simulation
 - Format academic research documentation following standard conventions
-- Design comprehensive verification strategies for neuromorphic hardware
-- Translate neuron mathematical models into efficient hardware implementations
-- Help with implementing on-chip learning mechanisms
-- Suggest parallelization strategies for multi-core neuromorphic systems
+- Assist with multi-physics modeling and numerical simulation
+- Translate mathematical models into efficient code implementations
+- Help with integrating AI techniques into mechanical engineering workflows
+- Suggest parallelization strategies for computationally intensive materials simulations
