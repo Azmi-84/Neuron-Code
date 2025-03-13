@@ -572,11 +572,56 @@ int main()
         printf("Column %d sum: %d\n", j + 1, colSum);
     }
 
+    // Merging two array in a single sorted array
+
+    int newArray5[] = {1, 23, 3, 25, 12};
+    int newArray6[] = {34, 12, 10, 121, 1212};
+
+    int size1 = sizeof(newArray5) / sizeof(newArray5[0]);
+    int size2 = sizeof(newArray6) / sizeof(newArray6[0]);
+    int mergeArraySize = size1 + size2;
+
+    int *mergeArray = (int *)malloc((mergeArraySize) * sizeof(int));
+
+    // Copy elements from first array
+    for (int i = 0; i < size1; i++)
+    {
+        mergeArray[i] = newArray5[i];
+    }
+
+    for (int i = 0; i < size2; i++)
+    {
+        mergeArray[size1 + i] = newArray6[i];
+    }
+
+    // Sort the merged array
+    for (int i = 0; i < mergeArraySize - 1; i++)
+    {
+        for (int j = 1; j < mergeArraySize; j++)
+        {
+            if (mergeArray[i] > mergeArray[j])
+            {
+                int temp = mergeArray[j];
+                mergeArray[i] = mergeArray[j];
+                mergeArray[j] = temp;
+            }
+        }
+    }
+
+    // Print the merged array
+    printf("\nMerged and sorted array: ");
+    for (int i = 0; i < mergeArraySize; i++)
+    {
+        printf("%d ", mergeArray[i]);
+    }
+    printf("\n");
+
     // Free allocated memory before exiting
     free(newArr3);
     free(evenArr);
     free(oddArr);
     free(newArr4);
+    free(mergeArray);
 
     return 0;
 }
