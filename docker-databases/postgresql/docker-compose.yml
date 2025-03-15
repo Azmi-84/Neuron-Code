@@ -9,9 +9,9 @@ services:
       - 5432:5432 # make sure you don't have another container running on 5432
 
     environment:
-      - POSTGRES_DB=chaiDB
-      - POSTGRES_USER=chaiaurcode
-      - POSTGRES_PASSWORD=chaiaurcode
+      - POSTGRES_DB=crimsonDB
+      - POSTGRES_USER=crimson
+      - POSTGRES_PASSWORD=crimson
 
   adminer:
     image: adminer

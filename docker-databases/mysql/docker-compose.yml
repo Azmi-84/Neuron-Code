@@ -6,10 +6,10 @@ services:
     image: mysql
     restart: always
     environment:
-      MYSQL_ROOT_PASSWORD: chaiaurcode
-      MYSQL_DATABASE: chaiDB
-      MYSQL_USER: chai
-      MYSQL_PASSWORD: chai
+      MYSQL_ROOT_PASSWORD: crimson
+      MYSQL_DATABASE: crimsonDB
+      MYSQL_USER: crimson
+      MYSQL_PASSWORD: crimson
     ports:
       - 3306:3306 # make sure you don't have another container running on 3306
     volumes:
@@ -18,4 +18,4 @@ services:
     image: adminer
     restart: always
     ports:
-      - 8080:8080
+      - 8090:8080
