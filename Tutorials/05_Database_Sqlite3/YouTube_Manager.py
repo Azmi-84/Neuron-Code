@@ -1,70 +1,87 @@
 import sqlite3
 
-# Connect to the database (creates the file if it doesn't exist)
-conn = sqlite3.connect('YouTube_Videos_List.db')
-cursor = conn.cursor()
-
-# Create the 'YouTube_Videos' table if it does not exist
-cursor.execute('''
-CREATE TABLE IF NOT EXISTS YouTube_Videos(
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    name TEXT NOT NULL,
-    time TEXT NOT NULL    
-)
-''')
-
 def list_videos():
-    cursor.execute("SELECT * FROM YouTube_Videos")
+    conn = sqlite3.connect('youtube_videos.db')
+    cursor = conn.cursor()
+    cursor.execute("SELECT * FROM videos")
+    videos = cursor.fetchall()
     
-    for row in cursor.fetchall():
-        print(row) 
+    if not videos:
+        print("No videos found!")
+    else:
+        for video in videos:
+            print(f"ID: {video[0]}, Title: {video[1]}, Time: {video[2]}")
+    
+    conn.close()
 
 def add_videos():
-    name = input("Enter the video name: ")
-    time = input("Enter the video time: ")
-    cursor.execute("INSERT INTO YouTube_Videos (name, time) VALUES (?, ?)", (name, time))
+    title = input("Enter video title: ")
+    time = input("Enter video time (MM:SS): ")
+    
+    conn = sqlite3.connect('youtube_videos.db')
+    cursor = conn.cursor()
+    cursor.execute("INSERT INTO videos (title, time) VALUES (?, ?)", (title, time))
     conn.commit()
+    print("Video added successfully!")
+    conn.close()
 
 def update_videos():
-    video_id = input("Enter the video ID: ")
-    new_name = input("Enter the video name: ")
-    new_time = input("Enter the video time: ")
-    cursor.execute("UPDATE YouTube_Videos SET name = ?, time = ? WHERE id = ?", (new_name, new_time, video_id))
+    video_id = input("Enter video ID to update: ")
+    title = input("Enter new title: ")
+    time = input("Enter new time (MM:SS): ")
+    
+    conn = sqlite3.connect('youtube_videos.db')
+    cursor = conn.cursor()
+    cursor.execute("UPDATE videos SET title = ?, time = ? WHERE id = ?", (title, time, video_id))
     conn.commit()
+    print("Video updated successfully!")
+    conn.close()
 
 def delete_videos():
-    video_id = input("Enter the video ID: ")
-    cursor.execute("DELETE FROM YouTube_Videos WHERE id = ?", (video_id,))
+    video_id = input("Enter video ID to delete: ")
+    
+    conn = sqlite3.connect('youtube_videos.db')
+    cursor = conn.cursor()
+    cursor.execute("DELETE FROM videos WHERE id = ?", (video_id,))
     conn.commit()
+    print("Video deleted successfully!")
+    conn.close()
 
 def main():
-    while True:
-        print("\n")
-        print("-" * 70)
-        print("Youtube Manager with Sqlite3 DB")
-        print('1. List all videos ')
-        print('2. Add a video ')
-        print('3. Update a video ')
-        print('4. Delete a video ')
-        print('5. Exit the app ')
-        
-        choice = input("Enter your choice: ")
-        
-        match choice:
-            case '1':
-                list_videos()
-            case '2':
-                add_videos()
-            case '3':
-                update_videos()
-            case '4':
-                delete_videos()
-            case '5':
-                break
-            case _:
-                print("Wrong input!!!")
-
+    conn = sqlite3.connect('youtube_videos.db')
+    cursor = conn.cursor()
+    cursor.execute('''
+    CREATE TABLE IF NOT EXISTS videos (
+        id INTEGER PRIMARY KEY,
+        title TEXT NOT NULL,
+        time TEXT NOT NULL
+    )
+    ''')
+    conn.commit()
     conn.close()
     
+    while True:
+        print("\nYouTube Manager")
+        print("1. List all videos")
+        print("2. Add a video")
+        print("3. Update a video")
+        print("4. Delete a video")
+        print("5. Exit")
+        
+        choice = input("Enter your choice (1-5): ")
+        
+        if choice == '1':
+            list_videos()
+        elif choice == '2':
+            add_videos()
+        elif choice == '3':
+            update_videos()
+        elif choice == '4':
+            delete_videos()
+        elif choice == '5':
+            break
+        else:
+            print("Invalid choice. Please try again.")
+
 if __name__ == "__main__":
     main()

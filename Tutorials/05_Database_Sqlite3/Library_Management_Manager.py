@@ -65,7 +65,7 @@ def search_book():
             
             match choice:
                 case '1':
-                    issue_book()
+                    issue_book(book[0])  # Pass the book_id
                 case '2':
                     return  
                 case _:

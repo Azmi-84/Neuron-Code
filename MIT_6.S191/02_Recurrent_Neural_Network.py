@@ -451,7 +451,7 @@ app._unparsable_cell(
             self.mby, self.vby = np.zeros_like(self.by), np.zeros_like(self.by)
 
         def forward(self, X, a_prev):
-            \"\"\"Performs a forward pass for a single time step.\"\"\"
+            """Performs a forward pass for a single time step."""
             a_next = np.tanh(
                 np.dot(self.Wax, X) + np.dot(self.Waa, a_prev) + self.ba
             )
@@ -462,7 +462,7 @@ app._unparsable_cell(
             return a_next, y_pred
 
         def backward(self, X, a, a_prev, y_pred, targets):
-            \"\"\"Performs a backward pass for a single time step.\"\"\"
+            """Performs a backward pass for a single time step."""
             dy = y_pred - targets
             dWya = np.dot(dy, a.T)
             dby = dy
@@ -480,7 +480,7 @@ app._unparsable_cell(
             return dWax, dWaa, dWya, dba, dby
 
         def adamW(self, dWax, dWaa, dWya, dba, dby, t):
-            \"\"\"Updates parameters using the AdamW optimization algorithm.\"\"\"
+            """Updates parameters using the AdamW optimization algorithm."""
             for param, dparam, m, v in zip(
                 [self.Wax, self.Waa, self.Wya, self.ba, self.by],
                 [dWax, dWaa, dWya, dba, dby],
@@ -496,19 +496,19 @@ app._unparsable_cell(
                 )
 
         def loss(self, y_pred, y_true):
-            \"\"\"Computes cross-entropy loss.\"\"\"
+            """Computes cross-entropy loss."""
             return -np.sum(
                 y_true * np.log(y_pred + 1e-8)
             )  # Add epsilon for numerical stability
 
         def train(self, X, targets, num_iterations=1000):
-            \"\"\"Trains the RNN on a sequence of inputs and targets.
+            """Trains the RNN on a sequence of inputs and targets.
 
             Args:
                 X (numpy.ndarray): Input sequence, shape (vocab_size, sequence_length).
                 targets (numpy.ndarray): Target sequence, shape (vocab_size, sequence_length).
                 num_iterations (int): Number of training iterations.
-            \"\"\"
+            """
             a_prev = np.zeros((self.hidden_size, 1))
             smooth_loss = -np.log(1.0 / self.vocab_size) * X.shape[1]
 
@@ -548,17 +548,17 @@ app._unparsable_cell(
 
                 smooth_loss = smooth_loss * 0.999 + loss * 0.001
                 if t % 100 == 0:
-                    print(f\"Iteration {t}, Smooth Loss: {smooth_loss:.4f}\")
+                    print(f"Iteration {t}, Smooth Loss: {smooth_loss:.4f}")
 
         def predict(self, start, char_to_index, index_to_char, length=100):
-            \"\"\"Generates text using the trained RNN.
+            """Generates text using the trained RNN.
 
             Args:
                 start (str): The initial character sequence.
                 char_to_index (dict): Mapping from character to index.
                 index_to_char (dict): Mapping from index to character.
                 length (int): Length of the generated sequence.
-            \"\"\"
+            """
             a = np.zeros((self.hidden_size, 1))
             X = np.zeros((self.vocab_size, 1))
             chars = list(start)
@@ -574,472 +574,7 @@ app._unparsable_cell(
                 X = np.zeros((self.vocab_size, 1))
                 X[idx] = 1
 
-            return \"\".join(chars)class RNN:
-        def __init__(
-            self,
-            vocab_size,
-            hidden_size=100,
-            learning_rate=0.01,
-            beta1=0.9,
-            beta2=0.999,
-            epsilon=1e-8,
-        ):
-            self.vocab_size = vocab_size
-            self.hidden_size = hidden_size
-            self.learning_rate = learning_rate
-            self.beta1 = beta1
-            self.beta2 = beta2
-            self.epsilon = epsilon
-
-            # Initialize weights and biases
-            self.Wax = np.random.randn(hidden_size, vocab_size) * 0.01
-            self.Waa = np.random.randn(hidden_size, hidden_size) * 0.01
-            self.Wya = np.random.randn(vocab_size, hidden_size) * 0.01
-            self.ba = np.zeros((hidden_size, 1))
-            self.by = np.zeros((vocab_size, 1))
-
-            # Initialize AdamW moment estimates
-            self.mWax, self.vWax = np.zeros_like(self.Wax), np.zeros_like(self.Wax)
-            self.mWaa, self.vWaa = np.zeros_like(self.Waa), np.zeros_like(self.Waa)
-            self.mWya, self.vWya = np.zeros_like(self.Wya), np.zeros_like(self.Wya)
-            self.mba, self.vba = np.zeros_like(self.ba), np.zeros_like(self.ba)
-            self.mby, self.vby = np.zeros_like(self.by), np.zeros_like(self.by)
-
-        def forward(self, X, a_prev):
-            \"\"\"Performs a forward pass for a single time step.\"\"\"
-            a_next = np.tanh(
-                np.dot(self.Wax, X) + np.dot(self.Waa, a_prev) + self.ba
-            )
-            y_pred = np.exp(np.dot(self.Wya, a_next) + self.by)
-            y_pred /= np.sum(
-                y_pred, axis=0, keepdims=True
-            )  # Softmax normalization
-            return a_next, y_pred
-
-        def backward(self, X, a, a_prev, y_pred, targets):
-            \"\"\"Performs a backward pass for a single time step.\"\"\"
-            dy = y_pred - targets
-            dWya = np.dot(dy, a.T)
-            dby = dy
-            da = np.dot(self.Wya.T, dy)
-
-            dtanh = (1 - a**2) * da
-            dWax = np.dot(dtanh, X.T)
-            dWaa = np.dot(dtanh, a_prev.T)
-            dba = np.sum(dtanh, axis=1, keepdims=True)
-
-            # Gradient clipping
-            for dparam in [dWax, dWaa, dWya, dba, dby]:
-                np.clip(dparam, -5, 5, out=dparam)
-
-            return dWax, dWaa, dWya, dba, dby
-
-        def adamW(self, dWax, dWaa, dWya, dba, dby, t):
-            \"\"\"Updates parameters using the AdamW optimization algorithm.\"\"\"
-            for param, dparam, m, v in zip(
-                [self.Wax, self.Waa, self.Wya, self.ba, self.by],
-                [dWax, dWaa, dWya, dba, dby],
-                [self.mWax, self.mWaa, self.mWya, self.mba, self.mby],
-                [self.vWax, self.vWaa, self.vWya, self.vba, self.vby],
-            ):
-                m[:] = self.beta1 * m + (1 - self.beta1) * dparam
-                v[:] = self.beta2 * v + (1 - self.beta2) * (dparam**2)
-                m_hat = m / (1 - self.beta1**t)
-                v_hat = v / (1 - self.beta2**t)
-                param -= (
-                    self.learning_rate * m_hat / (np.sqrt(v_hat) + self.epsilon)
-                )
-
-        def loss(self, y_pred, y_true):
-            \"\"\"Computes cross-entropy loss.\"\"\"
-            return -np.sum(
-                y_true * np.log(y_pred + 1e-8)
-            )  # Add epsilon for numerical stability
-
-        def train(self, X, targets, num_iterations=1000):
-            \"\"\"Trains the RNN on a sequence of inputs and targets.
-
-            Args:
-                X (numpy.ndarray): Input sequence, shape (vocab_size, sequence_length).
-                targets (numpy.ndarray): Target sequence, shape (vocab_size, sequence_length).
-                num_iterations (int): Number of training iterations.
-            \"\"\"
-            a_prev = np.zeros((self.hidden_size, 1))
-            smooth_loss = -np.log(1.0 / self.vocab_size) * X.shape[1]
-
-            for t in range(1, num_iterations + 1):
-                loss = 0
-                dWax, dWaa, dWya, dba, dby = (
-                    np.zeros_like(self.Wax),
-                    np.zeros_like(self.Waa),
-                    np.zeros_like(self.Wya),
-                    np.zeros_like(self.ba),
-                    np.zeros_like(self.by),
-                )
-
-                # Forward pass through the sequence
-                for i in range(X.shape[1]):
-                    a_next, y_pred = self.forward(X[:, i].reshape(-1, 1), a_prev)
-                    loss += self.loss(y_pred, targets[:, i].reshape(-1, 1))
-
-                    # Backward pass
-                    dWax_t, dWaa_t, dWya_t, dba_t, dby_t = self.backward(
-                        X[:, i].reshape(-1, 1),
-                        a_next,
-                        a_prev,
-                        y_pred,
-                        targets[:, i].reshape(-1, 1),
-                    )
-                    dWax += dWax_t
-                    dWaa += dWaa_t
-                    dWya += dWya_t
-                    dba += dba_t
-                    dby += dby_t
-
-                    a_prev = a_next  # Update hidden state
-
-                # Update parameters using AdamW
-                self.adamW(dWax, dWaa, dWya, dba, dby, t)
-
-                smooth_loss = smooth_loss * 0.999 + loss * 0.001
-                if t % 100 == 0:
-                    print(f\"Iteration {t}, Smooth Loss: {smooth_loss:.4f}\")
-
-        def predict(self, start, char_to_index, index_to_char, length=100):
-            \"\"\"Generates text using the trained RNN.
-
-            Args:
-                start (str): The initial character sequence.
-                char_to_index (dict): Mapping from character to index.
-                index_to_char (dict): Mapping from index to character.
-                length (int): Length of the generated sequence.
-            \"\"\"
-            a = np.zeros((self.hidden_size, 1))
-            X = np.zeros((self.vocab_size, 1))
-            chars = list(start)
-
-            for ch in start:
-                X[char_to_index[ch]] = 1
-                a, _ = self.forward(X, a)
-
-            for _ in range(length):
-                _, y_pred = self.forward(X, a)
-                idx = np.random.choice(range(self.vocab_size), p=y_pred.ravel())
-                chars.append(index_to_char[idx])
-                X = np.zeros((self.vocab_size, 1))
-                X[idx] = 1
-
-            return \"\".join(chars)class RNN:
-        def __init__(
-            self,
-            vocab_size,
-            hidden_size=100,
-            learning_rate=0.01,
-            beta1=0.9,
-            beta2=0.999,
-            epsilon=1e-8,
-        ):
-            self.vocab_size = vocab_size
-            self.hidden_size = hidden_size
-            self.learning_rate = learning_rate
-            self.beta1 = beta1
-            self.beta2 = beta2
-            self.epsilon = epsilon
-
-            # Initialize weights and biases
-            self.Wax = np.random.randn(hidden_size, vocab_size) * 0.01
-            self.Waa = np.random.randn(hidden_size, hidden_size) * 0.01
-            self.Wya = np.random.randn(vocab_size, hidden_size) * 0.01
-            self.ba = np.zeros((hidden_size, 1))
-            self.by = np.zeros((vocab_size, 1))
-
-            # Initialize AdamW moment estimates
-            self.mWax, self.vWax = np.zeros_like(self.Wax), np.zeros_like(self.Wax)
-            self.mWaa, self.vWaa = np.zeros_like(self.Waa), np.zeros_like(self.Waa)
-            self.mWya, self.vWya = np.zeros_like(self.Wya), np.zeros_like(self.Wya)
-            self.mba, self.vba = np.zeros_like(self.ba), np.zeros_like(self.ba)
-            self.mby, self.vby = np.zeros_like(self.by), np.zeros_like(self.by)
-
-        def forward(self, X, a_prev):
-            \"\"\"Performs a forward pass for a single time step.\"\"\"
-            a_next = np.tanh(
-                np.dot(self.Wax, X) + np.dot(self.Waa, a_prev) + self.ba
-            )
-            y_pred = np.exp(np.dot(self.Wya, a_next) + self.by)
-            y_pred /= np.sum(
-                y_pred, axis=0, keepdims=True
-            )  # Softmax normalization
-            return a_next, y_pred
-
-        def backward(self, X, a, a_prev, y_pred, targets):
-            \"\"\"Performs a backward pass for a single time step.\"\"\"
-            dy = y_pred - targets
-            dWya = np.dot(dy, a.T)
-            dby = dy
-            da = np.dot(self.Wya.T, dy)
-
-            dtanh = (1 - a**2) * da
-            dWax = np.dot(dtanh, X.T)
-            dWaa = np.dot(dtanh, a_prev.T)
-            dba = np.sum(dtanh, axis=1, keepdims=True)
-
-            # Gradient clipping
-            for dparam in [dWax, dWaa, dWya, dba, dby]:
-                np.clip(dparam, -5, 5, out=dparam)
-
-            return dWax, dWaa, dWya, dba, dby
-
-        def adamW(self, dWax, dWaa, dWya, dba, dby, t):
-            \"\"\"Updates parameters using the AdamW optimization algorithm.\"\"\"
-            for param, dparam, m, v in zip(
-                [self.Wax, self.Waa, self.Wya, self.ba, self.by],
-                [dWax, dWaa, dWya, dba, dby],
-                [self.mWax, self.mWaa, self.mWya, self.mba, self.mby],
-                [self.vWax, self.vWaa, self.vWya, self.vba, self.vby],
-            ):
-                m[:] = self.beta1 * m + (1 - self.beta1) * dparam
-                v[:] = self.beta2 * v + (1 - self.beta2) * (dparam**2)
-                m_hat = m / (1 - self.beta1**t)
-                v_hat = v / (1 - self.beta2**t)
-                param -= (
-                    self.learning_rate * m_hat / (np.sqrt(v_hat) + self.epsilon)
-                )
-
-        def loss(self, y_pred, y_true):
-            \"\"\"Computes cross-entropy loss.\"\"\"
-            return -np.sum(
-                y_true * np.log(y_pred + 1e-8)
-            )  # Add epsilon for numerical stability
-
-        def train(self, X, targets, num_iterations=1000):
-            \"\"\"Trains the RNN on a sequence of inputs and targets.
-
-            Args:
-                X (numpy.ndarray): Input sequence, shape (vocab_size, sequence_length).
-                targets (numpy.ndarray): Target sequence, shape (vocab_size, sequence_length).
-                num_iterations (int): Number of training iterations.
-            \"\"\"
-            a_prev = np.zeros((self.hidden_size, 1))
-            smooth_loss = -np.log(1.0 / self.vocab_size) * X.shape[1]
-
-            for t in range(1, num_iterations + 1):
-                loss = 0
-                dWax, dWaa, dWya, dba, dby = (
-                    np.zeros_like(self.Wax),
-                    np.zeros_like(self.Waa),
-                    np.zeros_like(self.Wya),
-                    np.zeros_like(self.ba),
-                    np.zeros_like(self.by),
-                )
-
-                # Forward pass through the sequence
-                for i in range(X.shape[1]):
-                    a_next, y_pred = self.forward(X[:, i].reshape(-1, 1), a_prev)
-                    loss += self.loss(y_pred, targets[:, i].reshape(-1, 1))
-
-                    # Backward pass
-                    dWax_t, dWaa_t, dWya_t, dba_t, dby_t = self.backward(
-                        X[:, i].reshape(-1, 1),
-                        a_next,
-                        a_prev,
-                        y_pred,
-                        targets[:, i].reshape(-1, 1),
-                    )
-                    dWax += dWax_t
-                    dWaa += dWaa_t
-                    dWya += dWya_t
-                    dba += dba_t
-                    dby += dby_t
-
-                    a_prev = a_next  # Update hidden state
-
-                # Update parameters using AdamW
-                self.adamW(dWax, dWaa, dWya, dba, dby, t)
-
-                smooth_loss = smooth_loss * 0.999 + loss * 0.001
-                if t % 100 == 0:
-                    print(f\"Iteration {t}, Smooth Loss: {smooth_loss:.4f}\")
-
-        def predict(self, start, char_to_index, index_to_char, length=100):
-            \"\"\"Generates text using the trained RNN.
-
-            Args:
-                start (str): The initial character sequence.
-                char_to_index (dict): Mapping from character to index.
-                index_to_char (dict): Mapping from index to character.
-                length (int): Length of the generated sequence.
-            \"\"\"
-            a = np.zeros((self.hidden_size, 1))
-            X = np.zeros((self.vocab_size, 1))
-            chars = list(start)
-
-            for ch in start:
-                X[char_to_index[ch]] = 1
-                a, _ = self.forward(X, a)
-
-            for _ in range(length):
-                _, y_pred = self.forward(X, a)
-                idx = np.random.choice(range(self.vocab_size), p=y_pred.ravel())
-                chars.append(index_to_char[idx])
-                X = np.zeros((self.vocab_size, 1))
-                X[idx] = 1
-
-            return \"\".join(chars)class RNN:
-        def __init__(
-            self,
-            vocab_size,
-            hidden_size=100,
-            learning_rate=0.01,
-            beta1=0.9,
-            beta2=0.999,
-            epsilon=1e-8,
-        ):
-            self.vocab_size = vocab_size
-            self.hidden_size = hidden_size
-            self.learning_rate = learning_rate
-            self.beta1 = beta1
-            self.beta2 = beta2
-            self.epsilon = epsilon
-
-            # Initialize weights and biases
-            self.Wax = np.random.randn(hidden_size, vocab_size) * 0.01
-            self.Waa = np.random.randn(hidden_size, hidden_size) * 0.01
-            self.Wya = np.random.randn(vocab_size, hidden_size) * 0.01
-            self.ba = np.zeros((hidden_size, 1))
-            self.by = np.zeros((vocab_size, 1))
-
-            # Initialize AdamW moment estimates
-            self.mWax, self.vWax = np.zeros_like(self.Wax), np.zeros_like(self.Wax)
-            self.mWaa, self.vWaa = np.zeros_like(self.Waa), np.zeros_like(self.Waa)
-            self.mWya, self.vWya = np.zeros_like(self.Wya), np.zeros_like(self.Wya)
-            self.mba, self.vba = np.zeros_like(self.ba), np.zeros_like(self.ba)
-            self.mby, self.vby = np.zeros_like(self.by), np.zeros_like(self.by)
-
-        def forward(self, X, a_prev):
-            \"\"\"Performs a forward pass for a single time step.\"\"\"
-            a_next = np.tanh(
-                np.dot(self.Wax, X) + np.dot(self.Waa, a_prev) + self.ba
-            )
-            y_pred = np.exp(np.dot(self.Wya, a_next) + self.by)
-            y_pred /= np.sum(
-                y_pred, axis=0, keepdims=True
-            )  # Softmax normalization
-            return a_next, y_pred
-
-        def backward(self, X, a, a_prev, y_pred, targets):
-            \"\"\"Performs a backward pass for a single time step.\"\"\"
-            dy = y_pred - targets
-            dWya = np.dot(dy, a.T)
-            dby = dy
-            da = np.dot(self.Wya.T, dy)
-
-            dtanh = (1 - a**2) * da
-            dWax = np.dot(dtanh, X.T)
-            dWaa = np.dot(dtanh, a_prev.T)
-            dba = np.sum(dtanh, axis=1, keepdims=True)
-
-            # Gradient clipping
-            for dparam in [dWax, dWaa, dWya, dba, dby]:
-                np.clip(dparam, -5, 5, out=dparam)
-
-            return dWax, dWaa, dWya, dba, dby
-
-        def adamW(self, dWax, dWaa, dWya, dba, dby, t):
-            \"\"\"Updates parameters using the AdamW optimization algorithm.\"\"\"
-            for param, dparam, m, v in zip(
-                [self.Wax, self.Waa, self.Wya, self.ba, self.by],
-                [dWax, dWaa, dWya, dba, dby],
-                [self.mWax, self.mWaa, self.mWya, self.mba, self.mby],
-                [self.vWax, self.vWaa, self.vWya, self.vba, self.vby],
-            ):
-                m[:] = self.beta1 * m + (1 - self.beta1) * dparam
-                v[:] = self.beta2 * v + (1 - self.beta2) * (dparam**2)
-                m_hat = m / (1 - self.beta1**t)
-                v_hat = v / (1 - self.beta2**t)
-                param -= (
-                    self.learning_rate * m_hat / (np.sqrt(v_hat) + self.epsilon)
-                )
-
-        def loss(self, y_pred, y_true):
-            \"\"\"Computes cross-entropy loss.\"\"\"
-            return -np.sum(
-                y_true * np.log(y_pred + 1e-8)
-            )  # Add epsilon for numerical stability
-
-        def train(self, X, targets, num_iterations=1000):
-            \"\"\"Trains the RNN on a sequence of inputs and targets.
-
-            Args:
-                X (numpy.ndarray): Input sequence, shape (vocab_size, sequence_length).
-                targets (numpy.ndarray): Target sequence, shape (vocab_size, sequence_length).
-                num_iterations (int): Number of training iterations.
-            \"\"\"
-            a_prev = np.zeros((self.hidden_size, 1))
-            smooth_loss = -np.log(1.0 / self.vocab_size) * X.shape[1]
-
-            for t in range(1, num_iterations + 1):
-                loss = 0
-                dWax, dWaa, dWya, dba, dby = (
-                    np.zeros_like(self.Wax),
-                    np.zeros_like(self.Waa),
-                    np.zeros_like(self.Wya),
-                    np.zeros_like(self.ba),
-                    np.zeros_like(self.by),
-                )
-
-                # Forward pass through the sequence
-                for i in range(X.shape[1]):
-                    a_next, y_pred = self.forward(X[:, i].reshape(-1, 1), a_prev)
-                    loss += self.loss(y_pred, targets[:, i].reshape(-1, 1))
-
-                    # Backward pass
-                    dWax_t, dWaa_t, dWya_t, dba_t, dby_t = self.backward(
-                        X[:, i].reshape(-1, 1),
-                        a_next,
-                        a_prev,
-                        y_pred,
-                        targets[:, i].reshape(-1, 1),
-                    )
-                    dWax += dWax_t
-                    dWaa += dWaa_t
-                    dWya += dWya_t
-                    dba += dba_t
-                    dby += dby_t
-
-                    a_prev = a_next  # Update hidden state
-
-                # Update parameters using AdamW
-                self.adamW(dWax, dWaa, dWya, dba, dby, t)
-
-                smooth_loss = smooth_loss * 0.999 + loss * 0.001
-                if t % 100 == 0:
-                    print(f\"Iteration {t}, Smooth Loss: {smooth_loss:.4f}\")
-
-        def predict(self, start, char_to_index, index_to_char, length=100):
-            \"\"\"Generates text using the trained RNN.
-
-            Args:
-                start (str): The initial character sequence.
-                char_to_index (dict): Mapping from character to index.
-                index_to_char (dict): Mapping from index to character.
-                length (int): Length of the generated sequence.
-            \"\"\"
-            a = np.zeros((self.hidden_size, 1))
-            X = np.zeros((self.vocab_size, 1))
-            chars = list(start)
-
-            for ch in start:
-                X[char_to_index[ch]] = 1
-                a, _ = self.forward(X, a)
-
-            for _ in range(length):
-                _, y_pred = self.forward(X, a)
-                idx = np.random.choice(range(self.vocab_size), p=y_pred.ravel())
-                chars.append(index_to_char[idx])
-                X = np.zeros((self.vocab_size, 1))
-                X[idx] = 1
-
-            return \"\".join(chars)
+            return "".join(chars)
     """,
     name="_"
 )
@@ -1057,16 +592,6 @@ def _(DataGenerator, RNN):
     X, targets = data_gen.generate_example()
 
     # Train the RNN
-    rnn.train(X, targets, num_iterations=10000)  # Initialize DataGenerator and RNN
-    data_gen = DataGenerator(
-        "/home/abdullahalazmi/Programming/Neuron_Code/MIT_6.S191/dinos.txt"
-    )
-    rnn = RNN(data_gen.vocab_size, hidden_size=100, learning_rate=0.01)
-
-    # Generate one-hot encoded example
-    X, targets = data_gen.generate_example()
-
-    # Train the RNN
     rnn.train(X, targets, num_iterations=10000)
     return X, data_gen, rnn, targets
 
@@ -1074,16 +599,12 @@ def _(DataGenerator, RNN):
 @app.cell
 def _(data_gen, rnn):
     rnn.predict("meo", data_gen.char_to_index, data_gen.index_to_char, length=10)
-    # rnn.predict("b", data_gen.char_to_index, data_gen.index_to_char, length=10)rnn.predict("meo", data_gen.char_to_index, data_gen.index_to_char, length=10)
-    # rnn.predict("b", data_gen.char_to_index, data_gen.index_to_char, length=10)rnn.predict("meo", data_gen.char_to_index, data_gen.index_to_char, length=10)
-    # rnn.predict("b", data_gen.char_to_index, data_gen.index_to_char, length=10)rnn.predict("meo", data_gen.char_to_index, data_gen.index_to_char, length=10)
-    # rnn.predict("b", data_gen.char_to_index, data_gen.index_to_char, length=10)
     return
 
 
 app._unparsable_cell(
     r"""
-    rnn.loss(X, targets)rnn.loss(X, targets)
+    rnn.loss(X, targets)
     """,
     name="_"
 )

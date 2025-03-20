@@ -119,8 +119,8 @@ app._unparsable_cell(
 
 
     def update_detector_confidence(threshold):
-        # YOLOv5 uses the .conf attribute to filter detections.
-        model.conf = threshold
+        # Ensure threshold is within valid range (0-1)
+        return max(0.01, min(threshold, 0.99))
 
 
     # -----------------------------
@@ -541,6 +541,30 @@ app._unparsable_cell(
     """,
     name="_"
 )
+
+
+@app.cell
+def _():
+    # Initialize variables, datasets or any setup needed for the notebook
+    import numpy as np
+    import matplotlib.pyplot as plt
+    import torch
+    import torch.nn as nn
+    import torch.optim as optim
+    
+    # Set random seeds for reproducibility
+    np.random.seed(42)
+    torch.manual_seed(42)
+    
+    return np, plt, torch, nn, optim
+
+
+def handleRate(value):
+    # Handler for rate adjustment in the learning process
+    global learning_rate
+    learning_rate = value
+    print(f"Learning rate set to: {learning_rate}")
+    return
 
 
 if __name__ == "__main__":
