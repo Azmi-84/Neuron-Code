@@ -5,15 +5,16 @@ import re
 from dotenv import load_dotenv
 from datetime import datetime, timezone, timedelta
 import uuid
-import bcrypt  # Add bcrypt for password hashing
+import bcrypt
+
 
 load_dotenv()
 # Retrieve the MongoDB connection string from environment variables
 uri = os.getenv("MONGODB_URI")
-# # Check if the URI is set
+# Check if the URI is set
 # if uri is None:
 #     raise ValueError("MONGODB_URI environment variable not set. Please set it in your .env file.")
-# # Print the URI for debugging purposes
+# Print the URI for debugging purposes
 # print(f"Connecting to MongoDB URI: {uri}")
 
 
