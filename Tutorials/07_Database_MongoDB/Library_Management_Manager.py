@@ -678,7 +678,7 @@ def student_sign_in():
             while True:
                 print("\nStudent Options")
                 print(
-                    "1. See the catalog\n2. Search for a book\n3. Issue a book\n4. Return a book\n5. Return to Student Menu"
+                    "1. See the catalog\n2. Search for a book\n3. Issue a book\n4. Return a book\n5. Reset Password\n6. Return to Student Menu"
                 )
 
                 option = input("Select one: ")
@@ -692,6 +692,8 @@ def student_sign_in():
                     case "4":
                         return_book()
                     case "5":
+                        reset_password("student")
+                    case "6":
                         return  # Return from the function instead of break
                     case _:
                         print("Invalid option. Please try again.")
@@ -772,7 +774,7 @@ def librarian_sign_in():
             while True:
                 print("\nLibrarian Options")
                 print(
-                    "1. View Catalog\n2. Search for a book\n3. Add New Book\n4. View Issued Books\n5. Remove Book\n6. Update Book\n7. Return to Librarian Menu"
+                    "1. View Catalog\n2. Search for a book\n3. Add New Book\n4. View Issued Books\n5. Remove Book\n6. Update Book\n7. Reset Password\n8. Return to Librarian Menu"
                 )
 
                 option = input("Select one: ")
@@ -790,6 +792,8 @@ def librarian_sign_in():
                     case "6":
                         update_book()
                     case "7":
+                        reset_password("librarian")
+                    case "8":
                         return  # Return from the function instead of break
                     case _:
                         print("Invalid option. Please try again.")
@@ -802,7 +806,7 @@ def librarian_sign_in():
 def librarian_role():
     while True:
         print("\nLibrarian Menu")
-        print("1. Sign in\n2. Sign up\n3. Return to Main Menu")
+        print("1. Sign in\n2. Sign up\n3. Reset Password\n4. Return to Main Menu")
 
         choice = input("Select one: ")
 
@@ -812,6 +816,8 @@ def librarian_role():
             case "2":
                 librarian_sign_up()
             case "3":
+                reset_password("librarian")
+            case "4":
                 return
             case _:
                 print("Invalid choice. Please try again.")
@@ -820,7 +826,7 @@ def librarian_role():
 def student_role():
     while True:
         print("\nStudent Menu")
-        print("1. Sign in\n2. Sign up\n3. Return to Main Menu")
+        print("1. Sign in\n2. Sign up\n3. Reset Password\n4. Return to Main Menu")
 
         choice = input("Select one: ")
 
@@ -830,9 +836,64 @@ def student_role():
             case "2":
                 student_sign_up()
             case "3":
+                reset_password("student")
+            case "4":
                 return
             case _:
                 print("Invalid choice. Please try again.")
+
+
+def reset_password(collection_name):
+    """Reset password function for both students and librarians"""
+    email = input("Enter your email: ")
+
+    # Determine which collection to use
+    if collection_name == "student":
+        collection = student_collection
+    elif collection_name == "librarian":
+        collection = librarian_collection
+    else:
+        print("Invalid collection type")
+        return
+
+    # Check if user exists
+    user = collection.find_one({"email": email})
+    if user is None:
+        print("Email not found. Please check your email and try again.")
+        return
+
+    # Verify identity with current password
+    current_password = input("Enter your current password: ")
+    if not bcrypt.checkpw(current_password.encode("utf-8"), user["password"]):
+        print("Incorrect password. Password reset failed.")
+        return
+
+    # Get and validate new password
+    while True:
+        new_password = input("Enter your new password: ")
+        if validate_password(new_password):
+            confirm_password = input("Confirm your new password: ")
+            if new_password == confirm_password:
+                break
+            else:
+                print("Passwords do not match. Please try again.")
+
+    # Hash and update the new password
+    hashed_password = bcrypt.hashpw(new_password.encode("utf-8"), bcrypt.gensalt())
+
+    try:
+        collection.update_one(
+            {"email": email},
+            {
+                "$set": {
+                    "password": hashed_password,
+                    "updated_at": datetime.now(timezone.utc),
+                }
+            },
+        )
+        print("Password reset successful!")
+    except Exception as e:
+        print(f"An error occurred while resetting password: {e}")
 
 
 def main():
