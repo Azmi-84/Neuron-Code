@@ -7,7 +7,6 @@ from datetime import datetime, timezone, timedelta
 import uuid
 import bcrypt  # Add bcrypt for password hashing
 
-# Load environment variables from .env file
 load_dotenv()
 # Retrieve the MongoDB connection string from environment variables
 uri = os.getenv("MONGODB_URI")
