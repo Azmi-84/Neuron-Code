@@ -369,7 +369,9 @@ app._unparsable_cell(
     import seaborn as snsmo.md(r\"\"\"# Learn Gradient Descent From Scratch Using Linear Regression\"\"\")
     """,
     name="_",
-    column=None, disabled=False, hide_code=True
+    column=None,
+    disabled=False,
+    hide_code=True,
 )
 
 
@@ -377,6 +379,7 @@ app._unparsable_cell(
 def _():
     import marimo as mo
     import pandas as pd
+
     df = pd.read_csv("Zomato-data-.csv")
     df.head()
     df = pd.read_csv("Wine-Quality.csv")
@@ -396,7 +399,7 @@ app._unparsable_cell(
     df = df.ffill()
     df
     """,
-    name="_"
+    name="_",
 )
 
 
@@ -404,7 +407,7 @@ app._unparsable_cell(
     r"""
     df.isnull().sum()df.info()df.shape
     """,
-    name="_"
+    name="_",
 )
 
 
@@ -412,7 +415,7 @@ app._unparsable_cell(
     r"""
     df.plot.scatter(\"tmax\", \"tmax_tomorrow\")df.isnull().sum()
     """,
-    name="_"
+    name="_",
 )
 
 
@@ -423,7 +426,7 @@ app._unparsable_cell(
     df.plot.scatter(\"tmax\", \"tmax_tomorrow\")
     plt.plot([30, 120], [30, 120], color=\"green\")df.describe()
     """,
-    name="_"
+    name="_",
 )
 
 
@@ -438,7 +441,9 @@ app._unparsable_cell(
     plt.xlabel(\"Type of Restaurant\")
     """,
     name="_",
-    column=None, disabled=False, hide_code=True
+    column=None,
+    disabled=False,
+    hide_code=True,
 )
 
 
@@ -454,7 +459,7 @@ app._unparsable_cell(
     sns.barplot(x=\"Type\", y=\"Votes\", data=result)
     plt.xlabel(\"Type of Restaurant\")
     """,
-    name="_"
+    name="_",
 )
 
 
@@ -464,7 +469,7 @@ app._unparsable_cell(
     plt.plot(df[\"tmax\"], model.predict(df[[\"tmax\"]]), color=\"green\")max_votes = result[\"Votes\"].max()
     result[result[\"Votes\"] == max_votes]
     """,
-    name="_"
+    name="_",
 )
 
 
@@ -472,7 +477,7 @@ app._unparsable_cell(
     r"""
     f\"Weights: {model.coef_}, Bias: {model.intercept_}\"sns.countplot(df[\"online_order\"], palette=\"viridis\")
     """,
-    name="_"
+    name="_",
 )
 
 
@@ -480,7 +485,7 @@ app._unparsable_cell(
     r"""
     sns.countplot(df[\"book_table\"], palette=\"viridis\")0.81854683 * 80 + 11.9865613801297
     """,
-    name="_"
+    name="_",
 )
 
 
@@ -488,7 +493,7 @@ app._unparsable_cell(
     r"""
     sns.histplot(df[\"rate\"], kde=True)mo.md(r\"\"\"# $MSE = (\hat{y} - y) ^ 2$\"\"\")
     """,
-    name="_"
+    name="_",
 )
 
 
@@ -518,7 +523,7 @@ app._unparsable_cell(
     plt.grid()
     plt.show()
     """,
-    name="_"
+    name="_",
 )
 
 
@@ -539,7 +544,7 @@ app._unparsable_cell(
     plt.grid()
     plt.show()
     """,
-    name="_"
+    name="_",
 )
 
 
@@ -551,11 +556,11 @@ def _():
     import torch
     import torch.nn as nn
     import torch.optim as optim
-    
+
     # Set random seeds for reproducibility
     np.random.seed(42)
     torch.manual_seed(42)
-    
+
     return np, plt, torch, nn, optim
 
 
