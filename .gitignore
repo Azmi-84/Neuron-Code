@@ -4,3 +4,4 @@ docker-databases/
 CS229/Wine-Quality.csv
 CS229/Zomato-data-.csv
 .idea/git_toolbox_blame.xml
+/venv/

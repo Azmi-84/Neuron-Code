@@ -1,5 +1,5 @@
 #include <stdio.h>
-#include <stdlib.h> // Required for malloc and free functions
+#include <stdlib.h> 
 
 /**
  * This program demonstrates fundamental array operations and algorithms
@@ -11,6 +11,7 @@
  *  - Simulation results
  *  - Crystallographic information
  */
+
 int main()
 {
     // ===== BASIC ARRAY OPERATIONS =====
