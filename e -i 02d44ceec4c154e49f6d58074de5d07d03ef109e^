@@ -1,0 +1,51 @@
+[33md83bf96[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mmain[m[33m, [m[1;31morigin/main[m[33m, [m[1;31morigin/HEAD[m[33m)[m refine: Remove unnecessary database lock files and temporary data
+[33m51acec5[m refine: Remove unnecessary database lock files and temporary data
+[33m02d44ce[m refine: Remove unnecessary database lock files and temporary data
+[33m9088d71[m refine: Enhance user authentication process
+[33m912097c[m refine: Clean up code formatting and improve readability
+[33m6a8cfe6[m refine: Improve code structure and readability
+[33mca7b3cd[m refine: Update Library Management features
+[33m60777c9[m refine: Add password reset functionality for students and librarians
+[33mb6a35e2[m refine: Remove outdated README.md content
+[33m8f34fbf[m refine: Clean up commented code in Library_Management_Manager.py
+[33m00c4185[m refine: Remove commented-out code for loading environment variables
+[33m6ab37f0[m refine: Remove unused Youtube_Manager.py and update Library_Management.db
+[33m1781db9[m refine: Remove outdated Ashby chart images and related files
+[33md5a127e[m refine: Remove outdated Ashby chart images and add image merging script
+[33m78b47e9[m refine: Update project structure and enhance code readability
+[33m7303b92[m refine: Remove outdated Ashby chart images and add new charting script
+[33m40eed78[m refine: Update documentation and improve code structure
+[33mc970589[m refine: Add comprehensive README for Neuron_Code Repository
+[33m9924ae0[m refine: Remove YouTube Manager script
+[33mba64756[m refine: Update various tutorials for improved functionality and error handling
+[33m14f52a7[m refine: Remove outdated material selection visualizations and associated files
+[33mcf4116d[m refine: Enhance material selection visualizations and update data files
+[33m0278194[m refine: Remove outdated chart images from the repository
+[33mf5c7c4e[m refine: Update Algae Biofuel Data files
+[33mb9aa571[m refine: Update database configurations in Docker Compose files
+[33m18cf44c[m refine: Add MongoDB connection and enhance API user fetching
+[33m0dda34f[m refine: Update binary data for Algae Biofuel Data file
+[33mf580950[m refine: Update Adminer port in MySQL Docker Compose configuration
+[33m84a878f[m refine: Update database configurations in Docker Compose files
+[33m90bcc77[m refine: Add Docker configurations for multiple databases
+[33m85b0289[m refine: Add merging and sorting functionality for arrays
+[33m74d6199[m refine: Update binary data for array tutorial
+[33ma7fca12[m refine: Improve documentation for GitHub Copilot integration
+[33m6c886a9[m refine: Update Copilot instructions to reflect current skills and interests
+[33md0b3b9e[m refine: Update Copilot commit message instructions for clarity and relevance
+[33m4bb4522[m refine: Enhance Copilot instructions for neuromorphic computing expertise
+[33m62a3249[m [docs]: Update C/C++ standards in VSCode settings
+[33mf230b52[m Update VSCode settings for GitHub Copilot integration
+[33md84992c[m Add Copilot custom instructions and move sorting example to tutorials
+[33md33ff04[m Add GitHub Copilot settings and implement random user fetching API tutorial
+[33m40f506f[m Remove SQLite database files and reintroduce YouTube Manager script
+[33m6351cbc[m Remove test scripts for AI conversation models
+[33me64ab82[m Implement additional tutorials for advanced file handling and database management
+[33m472367a[m Add file handling and database management tutorials in C and Python
+[33m2be9d12[m done
+[33md23390e[m baiscs more
+[33mb0d356e[m basics
+[33m2d8b531[m Implement model evaluation metrics for Recurrent Neural Network
+[33meea1cd8[m Add array manipulation examples in C tutorial
+[33ma63cb16[m Implement data preprocessing for Recurrent Neural Network training
+[33mc030a83[m Add initial project configuration files and implement Recurrent Neural Network application
