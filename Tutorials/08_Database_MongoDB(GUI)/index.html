@@ -1,0 +1,460 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Library Management System</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Library Management System</h1>
+        </header>
+
+        <!-- Main Role Selection -->
+        <div id="role-selection" class="section">
+            <h2>Welcome to the Library Management System</h2>
+            <p>Please select your role:</p>
+            <div class="role-buttons">
+                <button id="student-btn" class="role-btn">
+                    <i class="fas fa-user-graduate"></i> Student
+                </button>
+                <button id="librarian-btn" class="role-btn">
+                    <i class="fas fa-user-tie"></i> Librarian
+                </button>
+            </div>
+        </div>
+
+        <!-- Authentication Sections -->
+        <div id="student-auth" class="section auth-section hidden">
+            <h2>Student Portal</h2>
+            <div class="auth-tabs">
+                <button class="auth-tab active" data-target="student-login">Login</button>
+                <button class="auth-tab" data-target="student-register">Register</button>
+                <button class="auth-tab" data-target="student-reset">Reset Password</button>
+            </div>
+            
+            <div id="student-login" class="auth-form">
+                <form id="student-login-form">
+                    <div class="form-group">
+                        <label for="student-email">Email:</label>
+                        <input type="email" id="student-email" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="student-password">Password:</label>
+                        <input type="password" id="student-password" required>
+                    </div>
+                    <button type="submit" class="submit-btn">Login</button>
+                </form>
+            </div>
+            
+            <div id="student-register" class="auth-form hidden">
+                <form id="student-register-form">
+                    <div class="form-group">
+                        <label for="new-student-id">Student ID:</label>
+                        <input type="text" id="new-student-id" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="new-student-username">Username:</label>
+                        <input type="text" id="new-student-username" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="new-student-email">Email:</label>
+                        <input type="email" id="new-student-email" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="new-student-password">Password:</label>
+                        <input type="password" id="new-student-password" required>
+                        <small>Must be at least 8 characters with uppercase, lowercase, digit, and special character</small>
+                    </div>
+                    <div class="form-group">
+                        <label for="confirm-student-password">Confirm Password:</label>
+                        <input type="password" id="confirm-student-password" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="new-student-phone">Phone Number:</label>
+                        <input type="tel" id="new-student-phone" required>
+                    </div>
+                    <button type="submit" class="submit-btn">Register</button>
+                </form>
+            </div>
+            
+            <div id="student-reset" class="auth-form hidden">
+                <form id="student-reset-form">
+                    <div class="form-group">
+                        <label for="reset-student-email">Email:</label>
+                        <input type="email" id="reset-student-email" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="reset-student-current">Current Password:</label>
+                        <input type="password" id="reset-student-current" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="reset-student-new">New Password:</label>
+                        <input type="password" id="reset-student-new" required>
+                        <small>Must be at least 8 characters with uppercase, lowercase, digit, and special character</small>
+                    </div>
+                    <div class="form-group">
+                        <label for="reset-student-confirm">Confirm New Password:</label>
+                        <input type="password" id="reset-student-confirm" required>
+                    </div>
+                    <button type="submit" class="submit-btn">Reset Password</button>
+                </form>
+            </div>
+            
+            <button id="back-from-student" class="back-btn">Back to Role Selection</button>
+        </div>
+
+        <div id="librarian-auth" class="section auth-section hidden">
+            <h2>Librarian Portal</h2>
+            <div class="auth-tabs">
+                <button class="auth-tab active" data-target="librarian-login">Login</button>
+                <button class="auth-tab" data-target="librarian-register">Register</button>
+                <button class="auth-tab" data-target="librarian-reset">Reset Password</button>
+            </div>
+            
+            <div id="librarian-login" class="auth-form">
+                <form id="librarian-login-form">
+                    <div class="form-group">
+                        <label for="librarian-email">Email:</label>
+                        <input type="email" id="librarian-email" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="librarian-password">Password:</label>
+                        <input type="password" id="librarian-password" required>
+                    </div>
+                    <button type="submit" class="submit-btn">Login</button>
+                </form>
+            </div>
+            
+            <div id="librarian-register" class="auth-form hidden">
+                <form id="librarian-register-form">
+                    <div class="form-group">
+                        <label for="new-librarian-id">Librarian ID:</label>
+                        <input type="text" id="new-librarian-id" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="new-librarian-username">Username:</label>
+                        <input type="text" id="new-librarian-username" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="new-librarian-email">Email:</label>
+                        <input type="email" id="new-librarian-email" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="new-librarian-password">Password:</label>
+                        <input type="password" id="new-librarian-password" required>
+                        <small>Must be at least 8 characters with uppercase, lowercase, digit, and special character</small>
+                    </div>
+                    <div class="form-group">
+                        <label for="confirm-librarian-password">Confirm Password:</label>
+                        <input type="password" id="confirm-librarian-password" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="new-librarian-phone">Phone Number:</label>
+                        <input type="tel" id="new-librarian-phone" required>
+                    </div>
+                    <button type="submit" class="submit-btn">Register</button>
+                </form>
+            </div>
+            
+            <div id="librarian-reset" class="auth-form hidden">
+                <form id="librarian-reset-form">
+                    <div class="form-group">
+                        <label for="reset-librarian-email">Email:</label>
+                        <input type="email" id="reset-librarian-email" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="reset-librarian-current">Current Password:</label>
+                        <input type="password" id="reset-librarian-current" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="reset-librarian-new">New Password:</label>
+                        <input type="password" id="reset-librarian-new" required>
+                        <small>Must be at least 8 characters with uppercase, lowercase, digit, and special character</small>
+                    </div>
+                    <div class="form-group">
+                        <label for="reset-librarian-confirm">Confirm New Password:</label>
+                        <input type="password" id="reset-librarian-confirm" required>
+                    </div>
+                    <button type="submit" class="submit-btn">Reset Password</button>
+                </form>
+            </div>
+            
+            <button id="back-from-librarian" class="back-btn">Back to Role Selection</button>
+        </div>
+
+        <!-- Student Dashboard -->
+        <div id="student-dashboard" class="section dashboard hidden">
+            <h2>Student Dashboard</h2>
+            <div class="user-welcome">Welcome, <span id="student-name"></span>!</div>
+            
+            <div class="dashboard-options">
+                <button class="dashboard-option" data-action="view-catalog">
+                    <i class="fas fa-book"></i> View Catalog
+                </button>
+                <button class="dashboard-option" data-action="search-book">
+                    <i class="fas fa-search"></i> Search Book
+                </button>
+                <button class="dashboard-option" data-action="issue-book">
+                    <i class="fas fa-bookmark"></i> Issue Book
+                </button>
+                <button class="dashboard-option" data-action="return-book">
+                    <i class="fas fa-undo"></i> Return Book
+                </button>
+                <button class="dashboard-option" data-action="reset-password">
+                    <i class="fas fa-key"></i> Reset Password
+                </button>
+            </div>
+            
+            <div id="student-content" class="dashboard-content">
+                <!-- Dynamic content will be loaded here -->
+                <div class="welcome-message">
+                    <h3>Welcome to your dashboard</h3>
+                    <p>Select an option from above to get started.</p>
+                </div>
+            </div>
+            
+            <button id="student-logout" class="logout-btn">Logout</button>
+        </div>
+
+        <!-- Librarian Dashboard -->
+        <div id="librarian-dashboard" class="section dashboard hidden">
+            <h2>Librarian Dashboard</h2>
+            <div class="user-welcome">Welcome, <span id="librarian-name"></span>!</div>
+            
+            <div class="dashboard-options">
+                <button class="dashboard-option" data-action="view-catalog">
+                    <i class="fas fa-book"></i> View Catalog
+                </button>
+                <button class="dashboard-option" data-action="search-book">
+                    <i class="fas fa-search"></i> Search Book
+                </button>
+                <button class="dashboard-option" data-action="add-book">
+                    <i class="fas fa-plus-circle"></i> Add Book
+                </button>
+                <button class="dashboard-option" data-action="view-issued">
+                    <i class="fas fa-clipboard-list"></i> View Issued Books
+                </button>
+                <button class="dashboard-option" data-action="remove-book">
+                    <i class="fas fa-trash"></i> Remove Book
+                </button>
+                <button class="dashboard-option" data-action="update-book">
+                    <i class="fas fa-edit"></i> Update Book
+                </button>
+                <button class="dashboard-option" data-action="reset-password">
+                    <i class="fas fa-key"></i> Reset Password
+                </button>
+            </div>
+            
+            <div id="librarian-content" class="dashboard-content">
+                <!-- Dynamic content will be loaded here -->
+                <div class="welcome-message">
+                    <h3>Welcome to your dashboard</h3>
+                    <p>Select an option from above to get started.</p>
+                </div>
+            </div>
+            
+            <button id="librarian-logout" class="logout-btn">Logout</button>
+        </div>
+
+        <!-- Templates for dynamic content -->
+        <template id="catalog-template">
+            <div class="catalog-container">
+                <h3>Book Catalog</h3>
+                <div class="books-container">
+                    <!-- Books will be added here dynamically -->
+                </div>
+            </div>
+        </template>
+        
+        <template id="book-card-template">
+            <div class="book-card">
+                <div class="book-info">
+                    <h4 class="book-title"></h4>
+                    <p><strong>ID:</strong> <span class="book-id"></span></p>
+                    <p><strong>Author:</strong> <span class="book-author"></span></p>
+                    <p><strong>Price:</strong> $<span class="book-price"></span></p>
+                    <p><strong>Quantity:</strong> <span class="book-quantity"></span></p>
+                    <p><strong>Publication:</strong> <span class="book-publication"></span></p>
+                    <p><strong>Publication Date:</strong> <span class="book-pub-date"></span></p>
+                </div>
+                <div class="book-actions">
+                    <!-- Actions will be added dynamically based on role -->
+                </div>
+            </div>
+        </template>
+
+        <template id="search-book-template">
+            <div class="search-container">
+                <h3>Search Books</h3>
+                <div class="search-form">
+                    <input type="text" id="search-query" placeholder="Enter book name or author...">
+                    <button id="search-button">Search</button>
+                </div>
+                <div class="search-results">
+                    <!-- Results will be added here dynamically -->
+                </div>
+            </div>
+        </template>
+
+        <template id="issue-book-template">
+            <div class="issue-book-container">
+                <h3>Issue a Book</h3>
+                <form id="issue-book-form">
+                    <div class="form-group">
+                        <label for="issue-book-id">Book ID:</label>
+                        <input type="text" id="issue-book-id" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="issue-student-id">Student ID:</label>
+                        <input type="text" id="issue-student-id" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="issue-username">Username:</label>
+                        <input type="text" id="issue-username" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="issue-return-date">Return Date:</label>
+                        <input type="date" id="issue-return-date" required>
+                    </div>
+                    <button type="submit" class="submit-btn">Issue Book</button>
+                </form>
+            </div>
+        </template>
+
+        <template id="return-book-template">
+            <div class="return-book-container">
+                <h3>Return a Book</h3>
+                <form id="return-book-form">
+                    <div class="form-group">
+                        <label for="return-book-id">Book ID:</label>
+                        <input type="text" id="return-book-id" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="return-student-id">Student ID:</label>
+                        <input type="text" id="return-student-id" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="return-username">Username:</label>
+                        <input type="text" id="return-username" required>
+                    </div>
+                    <button type="submit" class="submit-btn">Return Book</button>
+                </form>
+                <div class="issued-books-list">
+                    <h4>Your Issued Books</h4>
+                    <div class="issued-books-container">
+                        <!-- Issued books will be added here -->
+                    </div>
+                </div>
+            </div>
+        </template>
+
+        <template id="add-book-template">
+            <div class="add-book-container">
+                <h3>Add New Book</h3>
+                <form id="add-book-form">
+                    <div class="form-group">
+                        <label for="add-book-name">Book Name:</label>
+                        <input type="text" id="add-book-name" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="add-author">Author:</label>
+                        <input type="text" id="add-author" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="add-price">Price:</label>
+                        <input type="number" step="0.01" id="add-price" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="add-quantity">Quantity:</label>
+                        <input type="number" id="add-quantity" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="add-publication">Publication:</label>
+                        <input type="text" id="add-publication" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="add-pub-date">Publication Date:</label>
+                        <input type="date" id="add-pub-date" required>
+                    </div>
+                    <button type="submit" class="submit-btn">Add Book</button>
+                </form>
+            </div>
+        </template>
+
+        <template id="remove-book-template">
+            <div class="remove-book-container">
+                <h3>Remove Book</h3>
+                <form id="remove-book-form">
+                    <div class="form-group">
+                        <label for="remove-book-id">Book ID:</label>
+                        <input type="text" id="remove-book-id" required>
+                    </div>
+                    <button type="submit" class="submit-btn">Remove Book</button>
+                </form>
+            </div>
+        </template>
+
+        <template id="update-book-template">
+            <div class="update-book-container">
+                <h3>Update Book</h3>
+                <form id="update-book-form">
+                    <div class="form-group">
+                        <label for="update-book-id">Book ID:</label>
+                        <input type="text" id="update-book-id" required>
+                        <button type="button" id="load-book-details">Load Details</button>
+                    </div>
+                    <div id="update-book-details" class="hidden">
+                        <div class="form-group">
+                            <label for="update-book-name">Book Name:</label>
+                            <input type="text" id="update-book-name">
+                        </div>
+                        <div class="form-group">
+                            <label for="update-author">Author:</label>
+                            <input type="text" id="update-author">
+                        </div>
+                        <div class="form-group">
+                            <label for="update-price">Price:</label>
+                            <input type="number" step="0.01" id="update-price">
+                        </div>
+                        <div class="form-group">
+                            <label for="update-quantity">Quantity:</label>
+                            <input type="number" id="update-quantity">
+                        </div>
+                        <div class="form-group">
+                            <label for="update-publication">Publication:</label>
+                            <input type="text" id="update-publication">
+                        </div>
+                        <div class="form-group">
+                            <label for="update-pub-date">Publication Date:</label>
+                            <input type="date" id="update-pub-date">
+                        </div>
+                        <button type="submit" class="submit-btn">Update Book</button>
+                    </div>
+                </form>
+            </div>
+        </template>
+
+        <template id="view-issued-template">
+            <div class="view-issued-container">
+                <h3>Issued Books</h3>
+                <div class="issued-books-list">
+                    <!-- Issued books will be added here -->
+                </div>
+            </div>
+        </template>
+    </div>
+
+    <!-- Notification System -->
+    <div id="notification" class="notification">
+        <span class="notification-message"></span>
+        <span class="notification-close">&times;</span>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
+<!-- Generated by Copilot -->
