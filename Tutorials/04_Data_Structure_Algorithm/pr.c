@@ -143,15 +143,15 @@
     // }
     
     int main() {
-        int size;
-        printf("Size: ");
-        scanf("%d", &size);
-        int arr[size];
-        for (int i = 0; i < size; i++)
-        {
-            printf("%d element: ", i+1);
-            scanf("%d", &arr[i]);
-        }
+        // int size;
+        // printf("Size: ");
+        // scanf("%d", &size);
+        // int arr[size];
+        // for (int i = 0; i < size; i++)
+        // {
+        //     printf("%d element: ", i+1);
+        //     scanf("%d", &arr[i]);
+        // }
         // int sum = 0;
         // for (int i = 0; i < size; i++)
         // {
@@ -187,44 +187,77 @@
         // }
         // printf("Max %d\n", arr[index]);
         // printf("Max %d\n", max);
-        int size_02;
-        printf("Size: ");
-        scanf("%d", &size_02);
-        int second_arr[size_02];
-        for (int i = 0; i < size_02; i++)
+        // int size_02;
+        // printf("Size: ");
+        // scanf("%d", &size_02);
+        // int second_arr[size_02];
+        // for (int i = 0; i < size_02; i++)
+        // {
+        //     scanf("%d",&second_arr[i]);
+        // }
+        // int third_arr[size+size_02];
+        // for (int i = 0; i < size; i++)
+        // {
+        //     third_arr[i] = arr[i];
+        // }
+        // for (int i = 0; i < size_02; i++)
+        // {
+        //     third_arr[size + i] = second_arr[i];
+        // }
+        // for (int i = 0; i < (size+size_02); i++)
+        // {
+        //     printf("%d ", third_arr[i]);
+        // }
+        // // Sort array in descending order using bubble sort
+        // for (int i = 0; i < (size+size_02)-1; i++)
+        // {
+        //     for (int j = 0; j < (size+size_02)-i-1; j++)
+        //     {
+        //         if (third_arr[j] < third_arr[j+1]) // For descending order use < instead of >
+        //         {
+        //             int temp = third_arr[j];
+        //             third_arr[j] = third_arr[j+1];
+        //             third_arr[j+1] = temp;
+        //         }
+        //     }
+        // }
+        
+        // printf("\nSorted array in descending order: \n");
+        // for (int i = 0; i < (size+size_02); i++)
+        // {
+        //     printf("%d ", third_arr[i]);
+        // }
+
+        int row, col;
+        scanf("%d", &row);
+        scanf("%d", &col);
+        int matrix[row][col];
+        for (int i = 0; i < row; i++)
         {
-            scanf("%d",&second_arr[i]);
-        }
-        int third_arr[size+size_02];
-        for (int i = 0; i < size; i++)
-        {
-            third_arr[i] = arr[i];
-        }
-        for (int i = 0; i < size_02; i++)
-        {
-            third_arr[size + i] = second_arr[i];
-        }
-        for (int i = 0; i < (size+size_02); i++)
-        {
-            printf("%d ", third_arr[i]);
-        }
-        // Sort array in descending order using bubble sort
-        for (int i = 0; i < (size+size_02)-1; i++)
-        {
-            for (int j = 0; j < (size+size_02)-i-1; j++)
+            for (int j = 0; j < col; j++)
             {
-                if (third_arr[j] < third_arr[j+1]) // For descending order use < instead of >
-                {
-                    int temp = third_arr[j];
-                    third_arr[j] = third_arr[j+1];
-                    third_arr[j+1] = temp;
-                }
+                scanf("%d", &matrix[i][j]);
             }
         }
-        
-        printf("\nSorted array in descending order: \n");
-        for (int i = 0; i < (size+size_02); i++)
+        // Row sums
+        for (int i = 0; i < row; i++)
         {
-            printf("%d ", third_arr[i]);
+            int rowSum = 0;
+            for (int j = 0; j < col; j++)
+            {
+                rowSum += matrix[i][j];
+            }
+            printf("Row %d sum: %d\n", i+1, rowSum);
+        }
+        
+        // Column sums
+        for (int j = 0; j < col; j++)
+        {
+            int colSum = 0;
+            for (int i = 0; i < row; i++)
+            {
+                colSum += matrix[i][j];
+            }
+            printf("Column %d sum: %d\n", j+1, colSum);
         }
     }
