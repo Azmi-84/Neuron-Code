@@ -4,5 +4,8 @@ MIT_6.S191/data/
 docker-databases/
 CS229/Wine-Quality.csv
 CS229/Zomato-data-.csv
-/venv/
+/.venv/
 /.idea/
+pyproject.toml
+requirements.txt
+.python-version
