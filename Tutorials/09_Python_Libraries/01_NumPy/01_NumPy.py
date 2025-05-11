@@ -26,7 +26,7 @@ def _(mo):
     ## Resources:
 
     - [Geeks for Geeks](https://www.geeksforgeeks.org/numpy-tutorial/)
-    - 
+    -
     """
     )
     return
@@ -43,6 +43,22 @@ def _(np):
 def _(np):
     arr_01 = np.array([[1, 2, 3], [4, 5, 6]])
     arr_01
+    return
+
+
+@app.cell
+def _(np):
+    # 2D array
+    arr_02 = np.zeros((3, 4))
+    arr_02
+    return
+
+
+@app.cell
+def _(np):
+    # 3D array
+    arr_03 = np.ones((2, 3, 4))
+    arr_03
     return
 
 
