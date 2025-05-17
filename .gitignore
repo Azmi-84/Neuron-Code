@@ -1,11 +1,8 @@
 Tutorials/07_Database_MongoDB/.env
-Tutorials/08_Database_MongoDB(GUI)/.env
 MIT_6.S191/data/
 docker-databases/
-CS229/Wine-Quality.csv
-CS229/Zomato-data-.csv
 /.venv/
-/.idea/
 pyproject.toml
 requirements.txt
 .python-version
+Tutorials/08_Database_MongoDB_GUI/.env
