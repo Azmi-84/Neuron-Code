@@ -24,12 +24,12 @@ def _(cv2, np, time):
     center_x = width // 2
     center_y = height // 2
 
-    cv2.namedWindow("Circle Tracker")
+    cv2.namedWindow("Paper Tracker")
 
     prev_x, prev_y = None, None
 
     prev_cmd = None
-    last_cmd_time = time.time()  # Initialize with current time
+    last_cmd_time = time.time()
     cmd_cooldown = 0.5  # seconds
 
     while True:
@@ -41,90 +41,99 @@ def _(cv2, np, time):
 
         frame = cv2.flip(frame, 1)  # Flip the frame horizontally
 
-        hsv = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
+        # Convert to grayscale to better detect white paper with black markings
+        gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
 
-        lower_green = np.array([35, 70, 70])  # Fixed missing '='
-        upper_green = np.array([90, 255, 255])
+        # Apply Gaussian blur to reduce noise
+        blurred = cv2.GaussianBlur(gray, (5, 5), 0)
 
-        mask = cv2.inRange(hsv, lower_green, upper_green)
+        # Apply adaptive thresholding to detect white paper
+        # The white paper will appear bright in the image
+        thresh = cv2.adaptiveThreshold(
+            blurred,
+            255,
+            cv2.ADAPTIVE_THRESH_GAUSSIAN_C,
+            cv2.THRESH_BINARY_INV,
+            11,
+            2,
+        )
 
-        kernals = np.ones((5, 5), np.uint8)
-        mask = cv2.erode(mask, kernals, iterations=1)
-        mask = cv2.dilate(mask, kernals, iterations=1)
-
+        # Find contours in the thresholded image
         contours, _ = cv2.findContours(
-            mask, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE
+            thresh, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE
         )
 
         cmd = None
 
         if contours:
+            # Find the largest contour (assuming it's the paper)
             c = max(contours, key=cv2.contourArea)
 
-            if cv2.contourArea(c) > 500:
-                ((x, y), radius) = cv2.minEnclosingCircle(c)
-                area = cv2.contourArea(c)
-                circle_area = np.pi * radius * radius
-                if area / circle_area > 0.6:
-                    cv2.circle(
-                        frame, (int(x), int(y)), int(radius), (0, 255, 0), 2
-                    )
-                    cv2.line(
-                        frame, (center_x, 0), (center_x, height), (255, 0, 0), 1
-                    )
-                    cv2.line(
-                        frame, (0, center_y), (width, center_y), (255, 0, 0), 1
-                    )
-                    center_dist = np.sqrt(
-                        (x - center_x) ** 2 + (y - center_y) ** 2
-                    )
+            if (
+                cv2.contourArea(c) > 5000
+            ):  # Increased min area since paper is larger
+                # Get the bounding rectangle
+                x, y, w, h = cv2.boundingRect(c)
 
-                    if prev_x is not None and prev_y is not None:
-                        current_time = time.time()
-                        if current_time - last_cmd_time > cmd_cooldown:
-                            if abs(x - center_x) > abs(y - center_y):
-                                if x < center_x - 50:  # Fixed missing space
-                                    cmd = "go left"
-                                elif x > center_x + 50:
-                                    cmd = "go right"
-                            else:
-                                if y < center_y - 50:
-                                    cmd = "go up"
-                                elif y > center_y + 50:
-                                    cmd = "go down"
+                # Calculate center of the paper
+                paper_x = x + w // 2
+                paper_y = y + h // 2
 
-                            if cmd is None:
-                                if radius > 70:
-                                    cmd = "go backward"
-                                elif radius < 30 and radius > 10:
-                                    cmd = "go forward"
+                # Draw rectangle around paper
+                cv2.rectangle(frame, (x, y), (x + w, y + h), (0, 255, 0), 2)
 
-                            if cmd is not None and cmd != prev_cmd:
-                                print(f"Command: {cmd}")
-                                prev_cmd = cmd
-                                last_cmd_time = current_time
+                # Draw center lines
+                cv2.line(frame, (center_x, 0), (center_x, height), (255, 0, 0), 1)
+                cv2.line(frame, (0, center_y), (width, center_y), (255, 0, 0), 1)
 
-                    prev_x, prev_y = x, y
+                # Calculate "radius" as half the diagonal for size estimation
+                radius = np.sqrt(w * w + h * h) / 2
+
+                if prev_x is not None and prev_y is not None:
+                    current_time = time.time()
+                    if current_time - last_cmd_time > cmd_cooldown:
+                        if abs(paper_x - center_x) > abs(paper_y - center_y):
+                            if paper_x < center_x - 50:
+                                cmd = "go left"
+                            elif paper_x > center_x + 50:
+                                cmd = "go right"
+                        else:
+                            if paper_y < center_y - 50:
+                                cmd = "go up"
+                            elif paper_y > center_y + 50:
+                                cmd = "go down"
+
+                        if cmd is None:
+                            if radius > 200:  # Adjusted for paper size
+                                cmd = "go backward"
+                            elif radius < 150 and radius > 50:
+                                cmd = "go forward"
+
+                        if cmd is not None and cmd != prev_cmd:
+                            print(f"Command: {cmd}")
+                            prev_cmd = cmd
+                            last_cmd_time = current_time
+
+                prev_x, prev_y = paper_x, paper_y
 
         if prev_cmd:
             cv2.putText(
                 frame,
                 prev_cmd,
                 (10, 30),
-                cv2.FONT_HERSHEY_SIMPLEX,  # Changed prev_command to prev_cmd
+                cv2.FONT_HERSHEY_SIMPLEX,
                 1,
                 (0, 0, 255),
                 2,
                 cv2.LINE_AA,
             )
 
-        cv2.imshow("Circle Tracker", frame)
-        cv2.imshow("Mask", mask)
+        cv2.imshow("Paper Tracker", frame)
+        cv2.imshow("Threshold", thresh)
 
         if cv2.waitKey(1) & 0xFF == ord("q"):
             break
 
-    # Moved these outside the loop
     cap.release()
     cv2.destroyAllWindows()
     return
