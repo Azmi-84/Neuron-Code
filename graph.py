@@ -1,0 +1,39 @@
+import matplotlib.pyplot as plt
+
+# Tube positions (1 to 11)
+tube_positions = list(range(1, 12))
+
+# Data for velocity head, piezometer head, and total head
+velocity_head = [0.0542, 0.0640, 0.0954, 0.1364, 0.2109, 0.3685, 0.2109, 0.1364, 0.0954, 0.0640, 0.0542]
+piezometer_head = [0.406, 0.386, 0.352, 0.305, 0.219, 0.066, 0.158, 0.215, 0.249, 0.266, 0.278]
+total_head = [0.4602, 0.45, 0.4474, 0.4414, 0.4299, 0.4345, 0.3689, 0.3514, 0.3444, 0.33, 0.3322]
+
+# Plotting
+plt.figure(figsize=(12, 7))
+plt.plot(tube_positions, piezometer_head, marker='o', label='Piezometer Head', color='blue', linewidth=2)
+plt.plot(tube_positions, velocity_head, marker='s', label='Velocity Head', color='red', linewidth=2)
+plt.plot(tube_positions, total_head, marker='^', label='Total Head', color='green', linewidth=2)
+
+# Highlighting the constriction area (tubes 5-7)
+plt.axvspan(5, 7, alpha=0.2, color='gray', label='Constriction')
+
+# Labels and Title
+plt.xlabel("Tube Position", fontsize=12)
+plt.ylabel("Head (m)", fontsize=12)
+plt.title("Verification of Bernoulli's Equation (Group 2)", fontsize=14, fontweight='bold')
+plt.legend(loc='best', frameon=True, fancybox=True, shadow=True)
+plt.grid(True, linestyle='--', alpha=0.7)
+plt.xticks(tube_positions)
+
+# Add annotation explaining Bernoulli's principle
+plt.annotate("Bernoulli's principle: As fluid velocity increases,\npressure decreases and vice versa.", 
+             xy=(6, 0.1), xytext=(2, 0.1),
+             arrowprops=dict(facecolor='black', shrink=0.05, width=1.5),
+             bbox=dict(boxstyle="round,pad=0.5", fc="yellow", alpha=0.3))
+
+# Save the plot first
+plt.tight_layout()
+plt.savefig("Verification_of_Bernoullis_Equation.png", dpi=300)
+
+# Then show it
+plt.show()
