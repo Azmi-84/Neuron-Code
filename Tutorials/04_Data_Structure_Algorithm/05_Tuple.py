@@ -7,6 +7,7 @@ app = marimo.App(width="full")
 @app.cell
 def _():
     import marimo as mo
+
     return
 
 
@@ -45,9 +46,7 @@ def _():
     _tup
     # _tup[2] = 100  # This will raise an error because tuples are immutable
     # _tup[1].append(100)  # This will raise an error because tuples are immutable
-    _tup[5].append(
-        5
-    )  # This is allowed because the list inside the tuple is mutable
+    _tup[5].append(5)  # This is allowed because the list inside the tuple is mutable
     _tup
     return
 
@@ -72,9 +71,7 @@ def _():
     _b
     _c
     _tup = (5, 6, 7, [8, 9])
-    _a, _b, _c, (_d, _e) = (
-        _tup  # Even sequences with nested tuples can be unpacked
-    )
+    _a, _b, _c, (_d, _e) = _tup  # Even sequences with nested tuples can be unpacked
     _d
     _e
     _seq = [(1, 2, 3), (4, 5, 6), (7, 8, 9)]
