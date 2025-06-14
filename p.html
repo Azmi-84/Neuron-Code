@@ -1,0 +1,776 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>VTOL Drone Technology & Market Insights</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;900&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      body {
+        font-family: "Inter", sans-serif;
+        background-color: #f0f4f8;
+      }
+      .chart-container {
+        position: relative;
+        width: 100%;
+        max-width: 600px;
+        margin-left: auto;
+        margin-right: auto;
+        height: 320px;
+        max-height: 400px;
+      }
+      @media (min-width: 640px) {
+        .chart-container {
+          height: 360px;
+        }
+      }
+      .gradient-text {
+        background: linear-gradient(90deg, #0047ff, #00d1ff);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+      }
+      .flowchart-node {
+        border: 2px solid #0047ff;
+        background-color: rgba(0, 71, 255, 0.05);
+        transition: all 0.3s ease;
+      }
+      .flowchart-node:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1),
+          0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        background-color: rgba(0, 71, 255, 0.1);
+      }
+      .flowchart-line {
+        position: absolute;
+        background-color: #00d1ff;
+        z-index: -1;
+      }
+    </style>
+  </head>
+  <body class="text-[#1E1E1E]">
+    <header class="bg-white shadow-lg sticky top-0 z-50">
+      <nav class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="flex items-center justify-between h-16">
+          <div class="flex items-center">
+            <span class="font-bold text-xl text-[#0047FF]">VTOL INSIGHTS</span>
+          </div>
+          <div class="hidden md:block">
+            <div class="ml-10 flex items-baseline space-x-4">
+              <a
+                href="#market"
+                class="text-gray-600 hover:text-[#0047FF] px-3 py-2 rounded-md text-sm font-medium"
+                >Market</a
+              >
+              <a
+                href="#configs"
+                class="text-gray-600 hover:text-[#0047FF] px-3 py-2 rounded-md text-sm font-medium"
+                >Configurations</a
+              >
+              <a
+                href="#challenges"
+                class="text-gray-600 hover:text-[#0047FF] px-3 py-2 rounded-md text-sm font-medium"
+                >Challenges</a
+              >
+              <a
+                href="#innovations"
+                class="text-gray-600 hover:text-[#0047FF] px-3 py-2 rounded-md text-sm font-medium"
+                >Innovations</a
+              >
+              <a
+                href="#applications"
+                class="text-gray-600 hover:text-[#0047FF] px-3 py-2 rounded-md text-sm font-medium"
+                >Applications</a
+              >
+            </div>
+          </div>
+        </div>
+      </nav>
+    </header>
+
+    <main>
+      <section id="hero" class="py-20 md:py-28">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+          <h1 class="text-4xl md:text-6xl font-extrabold tracking-tight">
+            The Ascent of <span class="gradient-text">VTOL Drones</span>
+          </h1>
+          <p class="mt-4 max-w-3xl mx-auto text-lg md:text-xl text-gray-600">
+            Combining the agility of helicopters with the efficiency of
+            fixed-wing aircraft, Vertical Take-Off and Landing (VTOL) drones are
+            reshaping industries. This report synthesizes key research to reveal
+            the market trends, technological hurdles, and groundbreaking
+            innovations driving the future of autonomous aviation.
+          </p>
+          <div class="mt-12 grid grid-cols-1 md:grid-cols-3 gap-8">
+            <div class="bg-white rounded-lg shadow-md p-6">
+              <p class="text-5xl font-bold gradient-text">$125B</p>
+              <p class="mt-2 text-gray-600 font-semibold">
+                Projected Commercial Market by 2032
+              </p>
+            </div>
+            <div class="bg-white rounded-lg shadow-md p-6">
+              <p class="text-5xl font-bold gradient-text">40 min</p>
+              <p class="mt-2 text-gray-600 font-semibold">
+                Typical Max Flight Time on Battery
+              </p>
+            </div>
+            <div class="bg-white rounded-lg shadow-md p-6">
+              <p class="text-5xl font-bold gradient-text">300 kts</p>
+              <p class="mt-2 text-gray-600 font-semibold">
+                Max Speed of Advanced Tilt-Rotors
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section id="market" class="py-16 bg-white">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <h2 class="text-3xl font-bold text-center">
+            The Market Takes Flight
+          </h2>
+          <p class="mt-4 max-w-3xl mx-auto text-center text-gray-600">
+            The global UAV market is experiencing exponential growth, with VTOL
+            technology as a key driver. This expansion is fueled by an
+            innovation feedback loop: new capabilities create new applications,
+            which in turn drives investment and further technological
+            breakthroughs.
+          </p>
+          <div class="mt-10 bg-gray-50 p-6 rounded-lg shadow-inner">
+            <div class="chart-container h-80 sm:h-96">
+              <canvas id="marketGrowthChart"></canvas>
+            </div>
+          </div>
+          <p class="mt-4 text-sm text-center text-gray-500">
+            This chart illustrates the dramatic projected growth of the civilian
+            drone market, highlighting the immense economic potential that
+            improvements in VTOL technology aim to unlock.
+          </p>
+        </div>
+      </section>
+
+      <section id="configs" class="py-16">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <h2 class="text-3xl font-bold text-center">
+            One Size Doesn't Fit All: VTOL Configurations
+          </h2>
+          <p class="mt-4 max-w-3xl mx-auto text-center text-gray-600">
+            VTOL drones are not a monolith. Different designs offer unique
+            trade-offs between speed, maneuverability, and efficiency, making
+            them suitable for specific missions. Understanding these
+            configurations is key to grasping the focus of current research.
+          </p>
+          <div
+            class="mt-10 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"
+          >
+            <div class="bg-white rounded-lg shadow-md p-6">
+              <h3 class="font-bold text-xl text-[#0047FF]">🚀 Multirotor</h3>
+              <p class="mt-2 text-gray-600">
+                Known for exceptional maneuverability and stable hovering, ideal
+                for inspection and photography but limited by shorter range and
+                endurance.
+              </p>
+            </div>
+            <div class="bg-white rounded-lg shadow-md p-6">
+              <h3 class="font-bold text-xl text-[#0047FF]">
+                ✈️ Tilt-Rotor / Tilt-Wing
+              </h3>
+              <p class="mt-2 text-gray-600">
+                These high-performance hybrids pivot their rotors or wings to
+                transition between vertical lift and efficient, high-speed
+                forward flight, but are mechanically complex.
+              </p>
+            </div>
+            <div class="bg-white rounded-lg shadow-md p-6">
+              <h3 class="font-bold text-xl text-[#0047FF]">➕ Lift + Cruise</h3>
+              <p class="mt-2 text-gray-600">
+                Uses separate systems for vertical lift and horizontal cruise. A
+                simpler design compromise, but the extra weight of unused motors
+                reduces efficiency.
+              </p>
+            </div>
+          </div>
+          <div class="mt-12 bg-white p-6 rounded-lg shadow-md">
+            <h3 class="text-2xl font-bold text-center mb-4">
+              Comparative Performance: Speed vs. Endurance
+            </h3>
+            <p class="max-w-2xl mx-auto text-center text-gray-600 mb-6">
+              This comparison highlights the fundamental design trade-offs.
+              While Multirotors excel in precision, Tilt-Rotors dominate in
+              speed and range, illustrating why different applications demand
+              different platforms.
+            </p>
+            <div class="chart-container h-80 sm:h-96">
+              <canvas id="configComparisonChart"></canvas>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section id="challenges" class="py-16 bg-white">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <h2 class="text-3xl font-bold text-center">
+            Core Challenges on the Horizon
+          </h2>
+          <p class="mt-4 max-w-3xl mx-auto text-center text-gray-600">
+            To unlock their full potential, VTOL drones must overcome
+            significant hurdles. These challenges span from fundamental
+            engineering problems to complex regulatory and societal issues, each
+            requiring dedicated innovation.
+          </p>
+          <div class="mt-10 grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
+            <div class="bg-gray-50 p-6 rounded-lg shadow-inner">
+              <div class="chart-container h-80 sm:h-96">
+                <canvas id="challengesRadarChart"></canvas>
+              </div>
+            </div>
+            <div>
+              <p class="mb-4 text-gray-700">
+                The radar chart visualizes the relative intensity of key
+                challenge areas. The "weight spiral" of
+                <strong class="text-[#0047FF]">Energy & Propulsion</strong>
+                remains the most significant technical barrier, directly
+                limiting flight time and payload. Concurrently, the complexities
+                of <strong class="text-[#0047FF]">Design & Control</strong> and
+                the need for robust
+                <strong class="text-[#FF007A]">Safety & Reliability</strong>
+                systems are critical engineering focal points. Finally,
+                <strong class="text-[#00D1FF]">Regulatory & Societal</strong>
+                acceptance represents a formidable non-technical obstacle to
+                widespread commercial deployment.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section id="innovations" class="py-16">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <h2 class="text-3xl font-bold text-center">
+            The Innovation Flywheel: Scopes for Improvement
+          </h2>
+          <p class="mt-4 max-w-3xl mx-auto text-center text-gray-600">
+            Research and development are rapidly addressing the core challenges
+            with a multidisciplinary approach. Breakthroughs in materials, power
+            systems, and artificial intelligence are paving the way for the next
+            generation of VTOL drones.
+          </p>
+          <div class="mt-12 bg-white p-8 rounded-lg shadow-md md:col-span-2">
+            <h3 class="text-2xl font-bold text-center mb-2">
+              The Pervasive Impact of Artificial Intelligence
+            </h3>
+            <p class="max-w-3xl mx-auto text-center text-gray-600 mb-8">
+              AI is not a single improvement; it's a foundational enabler that
+              enhances nearly every aspect of VTOL drone design and operation.
+              This flowchart illustrates how AI-driven optimization and autonomy
+              create a cascade of improvements across the entire system.
+            </p>
+            <div class="relative flex flex-col items-center">
+              <div class="flowchart-node w-48 text-center p-3 rounded-lg z-10">
+                <h4 class="font-bold">Artificial Intelligence</h4>
+                <p class="text-sm">Core Enabler</p>
+              </div>
+              <div
+                class="mt-16 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-x-8 gap-y-12 relative"
+              >
+                <div
+                  class="absolute top-[-4rem] left-1/2 w-0.5 h-16 bg-[#00D1FF] transform -translate-x-1/2"
+                ></div>
+                <div
+                  class="absolute top-[-4.1rem] left-0 right-0 h-0.5 bg-[#00D1FF] hidden lg:block"
+                ></div>
+
+                <div class="flowchart-node text-center p-3 rounded-lg relative">
+                  <div
+                    class="absolute bottom-full left-1/2 w-0.5 h-8 bg-[#00D1FF] transform -translate-x-1/2 hidden lg:block"
+                  ></div>
+                  <h4 class="font-bold">Generative Design</h4>
+                  <p class="text-sm">
+                    Optimized lightweight structures and aerodynamics.
+                  </p>
+                </div>
+                <div class="flowchart-node text-center p-3 rounded-lg relative">
+                  <div
+                    class="absolute bottom-full left-1/2 w-0.5 h-8 bg-[#00D1FF] transform -translate-x-1/2 hidden lg:block"
+                  ></div>
+                  <h4 class="font-bold">Autonomous Navigation</h4>
+                  <p class="text-sm">
+                    GNSS-denied operation, obstacle avoidance, and path
+                    planning.
+                  </p>
+                </div>
+                <div class="flowchart-node text-center p-3 rounded-lg relative">
+                  <div
+                    class="absolute bottom-full left-1/2 w-0.5 h-8 bg-[#00D1FF] transform -translate-x-1/2 hidden lg:block"
+                  ></div>
+                  <h4 class="font-bold">Energy Management</h4>
+                  <p class="text-sm">
+                    Integrated optimization of power use and mission planning.
+                  </p>
+                </div>
+                <div class="flowchart-node text-center p-3 rounded-lg relative">
+                  <div
+                    class="absolute bottom-full left-1/2 w-0.5 h-8 bg-[#00D1FF] transform -translate-x-1/2 hidden lg:block"
+                  ></div>
+                  <h4 class="font-bold">Fault Tolerance</h4>
+                  <p class="text-sm">
+                    Predictive maintenance and real-time failure compensation.
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="mt-8 grid grid-cols-1 md:grid-cols-2 gap-8">
+            <div class="bg-white p-6 rounded-lg shadow-md">
+              <h3 class="text-2xl font-bold text-center mb-4">
+                Powering the Future: Propulsion Systems
+              </h3>
+              <p class="text-gray-600 text-center mb-6">
+                Extending flight time is paramount. Research is focused on
+                hybrid-electric systems, which combine the energy density of
+                fuel with the efficiency of electric motors, and next-generation
+                batteries.
+              </p>
+              <div class="chart-container h-72 sm:h-80">
+                <canvas id="propulsionChart"></canvas>
+              </div>
+              <p class="mt-4 text-sm text-center text-gray-500">
+                The chart shows the clear advantage of hybrid systems for
+                endurance-critical missions.
+              </p>
+            </div>
+            <div class="bg-white p-6 rounded-lg shadow-md">
+              <h3 class="text-2xl font-bold text-center mb-4">
+                The Next Frontier: Emerging Concepts
+              </h3>
+              <p class="text-gray-600 mb-6">
+                Beyond incremental improvements, researchers are exploring
+                transformative technologies that will redefine what UAVs can do,
+                from dynamically changing shape to collaborating in intelligent
+                swarms.
+              </p>
+              <ul class="space-y-4">
+                <li class="flex items-start">
+                  <span class="text-2xl mr-4 text-[#0047FF]">🦋</span>
+                  <div>
+                    <h4 class="font-bold">Transformability</h4>
+                    <p class="text-gray-600">
+                      Drones that morph their wings or reconfigure their
+                      airframes mid-flight to optimize performance for different
+                      mission phases, such as hovering vs. high-speed cruise.
+                    </p>
+                  </div>
+                </li>
+                <li class="flex items-start">
+                  <span class="text-2xl mr-4 text-[#0047FF]">🐝</span>
+                  <div>
+                    <h4 class="font-bold">Swarm Intelligence</h4>
+                    <p class="text-gray-600">
+                      Groups of drones that cooperate on complex tasks like
+                      large-scale search and rescue or environmental monitoring,
+                      requiring advanced decentralized control and
+                      communication.
+                    </p>
+                  </div>
+                </li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section id="applications" class="py-16 bg-white">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <h2 class="text-3xl font-bold text-center">
+            The Mission Drives the Machine
+          </h2>
+          <p class="mt-4 max-w-3xl mx-auto text-center text-gray-600">
+            The diverse and demanding requirements of various industries are the
+            primary force shaping VTOL innovation. Each application pushes
+            development in specific directions, from noise reduction for urban
+            transport to heavy-lift capacity for military logistics.
+          </p>
+          <div class="mt-10 grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
+            <div>
+              <h3 class="font-bold text-xl mb-4">
+                Primary Application Drivers
+              </h3>
+              <p class="text-gray-600 mb-6">
+                This chart highlights the key sectors pushing VTOL technology
+                forward. Urban Air Mobility (UAM), while still emerging,
+                represents a massive potential market that heavily influences
+                research into safety, noise reduction, and air traffic
+                integration. Meanwhile, established applications in
+                infrastructure, logistics, and military continue to drive demand
+                for greater range, payload, and autonomy.
+              </p>
+              <ul class="space-y-4">
+                <li class="font-semibold">
+                  <span
+                    class="inline-block w-4 h-4 rounded-full mr-2"
+                    style="background-color: #0047ff"
+                  ></span
+                  >Urban Air Mobility (UAM) & Delivery
+                </li>
+                <li class="font-semibold">
+                  <span
+                    class="inline-block w-4 h-4 rounded-full mr-2"
+                    style="background-color: #00d1ff"
+                  ></span
+                  >Infrastructure & Agriculture
+                </li>
+                <li class="font-semibold">
+                  <span
+                    class="inline-block w-4 h-4 rounded-full mr-2"
+                    style="background-color: #ff007a"
+                  ></span
+                  >Military & Emergency Response
+                </li>
+              </ul>
+            </div>
+            <div class="bg-gray-50 p-6 rounded-lg shadow-inner">
+              <div class="chart-container h-72 sm:h-80">
+                <canvas id="applicationPieChart"></canvas>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="py-16">
+        <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+          <h2 class="text-3xl font-bold">
+            The Path Forward: An Integrated Future
+          </h2>
+          <p class="mt-4 text-lg text-gray-600">
+            The evolution of VTOL drones is moving beyond optimizing individual
+            components to holistic, system-level integration. Future success
+            depends on a triad of progress:
+          </p>
+          <div class="mt-8 grid grid-cols-1 md:grid-cols-3 gap-8">
+            <div
+              class="bg-white p-6 rounded-lg shadow-md border-t-4 border-[#0047FF]"
+            >
+              <h3 class="font-bold text-lg">Technological Synergy</h3>
+              <p class="mt-2 text-gray-600">
+                Unlocking full potential requires "soft" technologies like AI
+                and advanced algorithms to work seamlessly with "hard"
+                technologies like next-gen batteries and lightweight materials.
+              </p>
+            </div>
+            <div
+              class="bg-white p-6 rounded-lg shadow-md border-t-4 border-[#00D1FF]"
+            >
+              <h3 class="font-bold text-lg">BVLOS Enablement</h3>
+              <p class="mt-2 text-gray-600">
+                Achieving true economic impact hinges on enabling safe and
+                reliable Beyond Visual Line of Sight (BVLOS) operations through
+                robust communication, navigation, and traffic management
+                systems.
+              </p>
+            </div>
+            <div
+              class="bg-white p-6 rounded-lg shadow-md border-t-4 border-[#FF007A]"
+            >
+              <h3 class="font-bold text-lg">Societal & Regulatory Harmony</h3>
+              <p class="mt-2 text-gray-600">
+                Widespread adoption cannot happen in a vacuum. Building public
+                trust and establishing clear, globally harmonized regulations
+                for safety, privacy, and noise are as crucial as any engineering
+                feat.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <footer class="bg-[#1E1E1E] text-white">
+      <div
+        class="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8 text-center text-sm"
+      >
+        <p>&copy; 2025 VTOL Insights. All rights reserved.</p>
+        <p class="text-gray-400 mt-1">
+          Infographic based on a literature review of Scopus-indexed journals on
+          VTOL drone improvement scopes.
+        </p>
+        <!-- 
+                Narrative and Visualization Plan Summary
+                ----------------------------------------
+                Palette: Energetic & Playful (#0047FF, #00D1FF, #FF007A, #FFFFFF, #1E1E1E)
+                Narrative Flow:
+                1. Hero: Introduce VTOLs with big stats.
+                2. Market Growth: Line chart to show economic potential.
+                3. Configurations: Cards and a Bar chart to explain design trade-offs.
+                4. Challenges: Radar chart to visualize the problem space.
+                5. Innovations: The core section with an HTML/CSS flowchart for AI's role, a donut chart for propulsion, and text for emerging concepts.
+                6. Applications: Pie chart to show market drivers.
+                7. Conclusion: Summarize the path forward.
+
+                Visualization Justification Summary
+                -----------------------------------
+                - Market Growth: Goal: Change -> Choice: Line Chart (Chart.js). Justification: Ideal for time-series data.
+                - Config Comparison: Goal: Compare -> Choice: Bar Chart (Chart.js). Justification: Best for comparing a metric across discrete categories.
+                - Core Challenges: Goal: Compare -> Choice: Radar Chart (Chart.js). Justification: Excellent for multi-dimensional comparison of a single subject.
+                - Propulsion Systems: Goal: Compare/Composition -> Choice: Donut Chart (Chart.js). Justification: Clear proportional comparison with space for a title.
+                - AI Impact: Goal: Organize/Process -> Choice: HTML/CSS Flowchart. Justification: Required method for showing process flow without SVG/Mermaid.
+                - Application Drivers: Goal: Composition -> Choice: Pie Chart (Chart.js). Justification: Simple, effective visualization of market composition.
+                - All visualizations use Canvas-based rendering via Chart.js or pure HTML/CSS. NO SVG or Mermaid JS used.
+            -->
+      </div>
+    </footer>
+
+    <script>
+      document.addEventListener("DOMContentLoaded", () => {
+        const wrapLabel = (str, maxLen = 16) => {
+          if (str.length <= maxLen) {
+            return str;
+          }
+          const words = str.split(" ");
+          const lines = [];
+          let currentLine = "";
+          for (const word of words) {
+            if ((currentLine + " " + word).trim().length > maxLen) {
+              lines.push(currentLine.trim());
+              currentLine = word;
+            } else {
+              currentLine = (currentLine + " " + word).trim();
+            }
+          }
+          if (currentLine) {
+            lines.push(currentLine.trim());
+          }
+          return lines;
+        };
+
+        const defaultTooltipConfig = {
+          plugins: {
+            tooltip: {
+              callbacks: {
+                title: function (tooltipItems) {
+                  const item = tooltipItems[0];
+                  let label = item.chart.data.labels[item.dataIndex];
+                  if (Array.isArray(label)) {
+                    return label.join(" ");
+                  } else {
+                    return label;
+                  }
+                },
+              },
+            },
+          },
+        };
+
+        const brandColors = {
+          blue: "#0047FF",
+          cyan: "#00D1FF",
+          magenta: "#FF007A",
+        };
+
+        const fontConfig = {
+          family: "Inter",
+          size: 12,
+        };
+
+        const renderMarketGrowthChart = () => {
+          const ctx = document
+            .getElementById("marketGrowthChart")
+            ?.getContext("2d");
+          if (!ctx) return;
+          new Chart(ctx, {
+            type: "line",
+            data: {
+              labels: ["2017", "2025 (proj.)", "2032 (proj.)"],
+              datasets: [
+                {
+                  label: "Global Civilian Drone Market (USD Billions)",
+                  data: [7.3, 45, 125],
+                  borderColor: brandColors.blue,
+                  backgroundColor: "rgba(0, 71, 255, 0.1)",
+                  fill: true,
+                  tension: 0.4,
+                  pointBackgroundColor: brandColors.blue,
+                  pointRadius: 5,
+                },
+              ],
+            },
+            options: {
+              responsive: true,
+              maintainAspectRatio: false,
+              scales: {
+                y: {
+                  beginAtZero: true,
+                  title: { display: true, text: "Market Size (USD Billions)" },
+                  ticks: { font: fontConfig },
+                },
+                x: { ticks: { font: fontConfig } },
+              },
+              ...defaultTooltipConfig,
+            },
+          });
+        };
+
+        const renderConfigComparisonChart = () => {
+          const ctx = document
+            .getElementById("configComparisonChart")
+            ?.getContext("2d");
+          if (!ctx) return;
+          new Chart(ctx, {
+            type: "bar",
+            data: {
+              labels: ["Multirotor", "Lift + Cruise", "Tilt-Rotor"],
+              datasets: [
+                {
+                  label: "Typical Max Speed (knots)",
+                  data: [60, 120, 300],
+                  backgroundColor: brandColors.blue,
+                  borderColor: brandColors.blue,
+                  borderWidth: 1,
+                },
+                {
+                  label: "Typical Max Endurance (minutes)",
+                  data: [40, 90, 240],
+                  backgroundColor: brandColors.cyan,
+                  borderColor: brandColors.cyan,
+                  borderWidth: 1,
+                },
+              ],
+            },
+            options: {
+              responsive: true,
+              maintainAspectRatio: false,
+              scales: {
+                y: { beginAtZero: true, ticks: { font: fontConfig } },
+                x: { ticks: { font: fontConfig } },
+              },
+              ...defaultTooltipConfig,
+            },
+          });
+        };
+
+        const renderChallengesRadarChart = () => {
+          const ctx = document
+            .getElementById("challengesRadarChart")
+            ?.getContext("2d");
+          if (!ctx) return;
+          new Chart(ctx, {
+            type: "radar",
+            data: {
+              labels: [
+                "Energy & Propulsion",
+                "Design & Control",
+                "Safety & Reliability",
+                wrapLabel("Regulatory & Societal Acceptance"),
+                "Environmental Resilience",
+              ],
+              datasets: [
+                {
+                  label: "Challenge Intensity",
+                  data: [9, 8, 7, 8, 6],
+                  backgroundColor: "rgba(255, 0, 122, 0.2)",
+                  borderColor: brandColors.magenta,
+                  pointBackgroundColor: brandColors.magenta,
+                  pointBorderColor: "#fff",
+                  pointHoverBackgroundColor: "#fff",
+                  pointHoverBorderColor: brandColors.magenta,
+                },
+              ],
+            },
+            options: {
+              responsive: true,
+              maintainAspectRatio: false,
+              scales: {
+                r: {
+                  beginAtZero: true,
+                  max: 10,
+                  pointLabels: { font: { size: 13, family: "Inter" } },
+                },
+              },
+              ...defaultTooltipConfig,
+            },
+          });
+        };
+
+        const renderPropulsionChart = () => {
+          const ctx = document
+            .getElementById("propulsionChart")
+            ?.getContext("2d");
+          if (!ctx) return;
+          new Chart(ctx, {
+            type: "doughnut",
+            data: {
+              labels: ["Battery-Electric", "Hybrid-Electric", "Fuel-Burning"],
+              datasets: [
+                {
+                  label: "Relative Endurance Potential",
+                  data: [20, 60, 100],
+                  backgroundColor: [
+                    brandColors.cyan,
+                    brandColors.magenta,
+                    brandColors.blue,
+                  ],
+                },
+              ],
+            },
+            options: {
+              responsive: true,
+              maintainAspectRatio: false,
+              plugins: {
+                legend: { position: "top" },
+                ...defaultTooltipConfig.plugins,
+              },
+            },
+          });
+        };
+
+        const renderApplicationPieChart = () => {
+          const ctx = document
+            .getElementById("applicationPieChart")
+            ?.getContext("2d");
+          if (!ctx) return;
+          new Chart(ctx, {
+            type: "pie",
+            data: {
+              labels: [
+                "Urban Air Mobility & Delivery",
+                "Infrastructure & Agriculture",
+                "Military & Emergency Response",
+              ],
+              datasets: [
+                {
+                  label: "Market Drivers",
+                  data: [45, 35, 20],
+                  backgroundColor: [
+                    brandColors.blue,
+                    brandColors.cyan,
+                    brandColors.magenta,
+                  ],
+                },
+              ],
+            },
+            options: {
+              responsive: true,
+              maintainAspectRatio: false,
+              plugins: {
+                legend: { display: false },
+                ...defaultTooltipConfig.plugins,
+              },
+            },
+          });
+        };
+
+        renderMarketGrowthChart();
+        renderConfigComparisonChart();
+        renderChallengesRadarChart();
+        renderPropulsionChart();
+        renderApplicationPieChart();
+      });
+    </script>
+  </body>
+</html>

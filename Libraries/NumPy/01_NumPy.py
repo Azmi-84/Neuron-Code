@@ -157,7 +157,91 @@ def _(np):
 
 
 @app.cell
-def _():
+def _(np):
+    # Arithmetic with NumPy Arrays
+
+    _arr1 = np.array([[1, 2, 3], [4, 5, 6], [7, 8, 9]])
+    _arr1 + _arr1
+    _arr1 - _arr1
+    _arr1 * _arr1
+    _arr1 / _arr1
+    _arr1**2
+    _arr1 % 2
+    _arr1 // 2
+
+    _arr2 = np.array([[2, 5, 8], [1, 3, 4], [6, 7, 9]])
+    _arr2 = _arr1
+    _arr2 > _arr1
+    _arr2 < _arr1
+    _arr2 == _arr1
+    _arr2 >= _arr1
+    _arr2 <= _arr1
+    _arr2 != _arr1
+    return
+
+
+@app.cell
+def _(np):
+    # Basic indexing and Slicing
+    _arr = np.arange(20)
+    _arr[7]
+    _arr[7:15]
+    _arr[7:15:2]
+    _arr[:10]
+    _arr[10:]
+    _arr[::2]
+    _arr[1::2]
+    _arr[-1]
+    _arr[-2]
+    _arr[-3:-1]
+    _arr[-3:]
+    _arr[-3:-1:2]
+    _arr[::3]
+    _arr[::3, np.newaxis]
+    _arr[:] = 4  # The "bare" slice [:] will assign 4 to every element in the array
+    _arr[5:8].copy()  # This will create a copy of the slice, not a view
+    _arr = np.arange(20).reshape((4, 5))
+    _arr
+    _arr[2]  # This will return the third row of the array
+    _arr[2, 3]  # This will return the element in the third row and fourth column
+    _arr[2][
+        3
+    ]  # This will also return the element in the third row and fourth column
+    _arr[
+        2, 3:5
+    ]  # This will return the elements in the third row and fourth and fifth columns
+    _arr[
+        2:4, 1:3
+    ]  # This will return a subarray from the third and fourth rows and second and third columns
+    _arr[:2, 1:]  # This will return the first two rows and second to last columns
+    _arr[1, :2]  # This will return the second row and first two columns
+    _arr[:2, 3]  # This will return the first two rows and fourth column
+    _arr[:, 3:5]  # This will return all rows and fourth and fifth columns
+    return
+
+
+@app.cell
+def _(np):
+    # Boolean indexing
+    _names = np.array(["Alice", "Bob", "Charlie", "David", "Eve"])
+    _ages = np.array([25, 30, 35, 40, 45])
+
+    _names == "Alice"  # This will return a boolean array indicating which names are "Alice"
+    _ages > 30  # This will return a boolean array indicating which ages are greater than 30
+    _ages[_names == "Alice"]  # This will return the ages of "Alice"
+    _ages[_ages > 30]  # This will return the ages greater than 30
+
+    _ages[_names == "Bob"]
+    _names != "Alice"  # This will return a boolean array indicating which names are not "Alice"
+
+    # Multiple conditions
+    _mask = (
+        (_ages > 30) & (_ages < 40)
+    )  # This will return a boolean array indicating which ages are greater than 30 and less than 40
+    _mask
+    _names[
+        _mask
+    ]  # This will return the names of people whose ages are greater than 30 and less than 40
     return
 
 
