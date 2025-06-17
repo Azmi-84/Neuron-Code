@@ -514,7 +514,7 @@ def _(np):
     plt.xlabel("X-axis")
     plt.ylabel("Y-axis")
     plt.close("all")
-    return
+    return (plt,)
 
 
 @app.cell
@@ -560,8 +560,205 @@ def _(np):
 
 
 @app.cell
-def _():
+def _(np):
     # Mathematical and Statistical Methods
+
+    np.random.seed(12345)
+    _arr = np.random.standard_normal((5, 4))
+    _arr
+
+    np.mean(_arr)  # This will return the mean of the array
+    np.median(_arr)  # This will return the median of the array
+    np.std(_arr)  # This will return the standard deviation of the array
+    np.var(_arr)  # This will return the variance of the array
+    np.min(_arr)  # This will return the minimum value of the array
+    np.max(_arr)  # This will return the maximum value of the array
+    np.sum(_arr)  # This will return the sum of all elements in the array
+    np.prod(_arr)  # This will return the product of all elements in the array
+    np.cumsum(_arr)  # This will return the cumulative sum of the array
+    np.cumprod(_arr)  # This will return the cumulative product of the array
+
+    _arr.mean(axis=1)  # _arr.mean(axis=1) means “compute mean across the columns”
+    _arr.mean(axis=0)  # _arr.mean(axis=0) means “compute mean across the rows”
+    _arr.std(
+        axis=1
+    )  # _arr.std(axis=1) means “compute standard deviation across the columns”
+    _arr.std(
+        axis=0
+    )  # _arr.std(axis=0) means “compute standard deviation across the rows”
+    _arr.var(axis=1)  # _arr.var(axis=1) means “compute variance across the columns”
+    _arr.var(axis=0)  # _arr.var(axis=0) means “compute variance across the rows”
+    _arr.min(axis=1)  # _arr.min(axis=1) means “compute minimum across the columns”
+    _arr.min(axis=0)  # _arr.min(axis=0) means “compute minimum across the rows”
+    _arr.max(axis=1)  # _arr.max(axis=1) means “compute maximum across the columns”
+    _arr.max(axis=0)  # _arr.max(axis=0) means “compute maximum across the rows”
+    _arr.sum(axis=1)  # _arr.sum(axis=1) means “compute sum across the columns”
+    _arr.sum(axis=0)  # _arr.sum(axis=0) means “compute sum across the rows”
+    _arr.prod(axis=1)  # _arr.prod(axis=1) means “compute product across the columns”
+    _arr.prod(axis=0)  # _arr.prod(axis=0) means “compute product across the rows”
+    _arr.cumsum(
+        axis=1
+    )  # _arr.cumsum(axis=1) means “compute cumulative sum across the columns”
+    _arr.cumsum(
+        axis=0
+    )  # _arr.cumsum(axis=0) means “compute cumulative sum across the rows”
+    _arr.cumprod(
+        axis=1
+    )  # _arr.cumprod(axis=1) means “compute cumulative product across the columns”
+    _arr.cumprod(
+        axis=0
+    )  # _arr.cumprod(axis=0) means “compute cumulative product across the rows”
+    _arr.argmin(
+        axis=1
+    )  # _arr.argmin(axis=1) means “find the index of the minimum value across the columns”
+    _arr.argmin(
+        axis=0
+    )  # _arr.argmin(axis=0) means “find the index of the minimum value across the rows”
+    _arr.argmax(
+        axis=1
+    )  # _arr.argmax(axis=1) means “find the index of the maximum value across the columns”
+    _arr.argmax(
+        axis=0
+    )  # _arr.argmax(axis=0) means “find the index of the maximum value across the rows”
+    _arr.argsort(
+        axis=1
+    )  # _arr.argsort(axis=1) means “find the indices that would sort the array across the columns”
+    _arr.argsort(
+        axis=0
+    )  # _arr.argsort(axis=0) means “find the indices that would sort the array across the rows”
+    _arr.sort(
+        axis=1
+    )  # _arr.sort(axis=1) means “sort the array across the columns in place”
+    return
+
+
+@app.cell
+def _(np):
+    # Methods for Boolean Arrays
+
+    _arr = np.random.standard_normal(100)
+    _arr
+    (_arr > 0).sum()  # This will return the number of positive values in the array
+    (_arr < 0).sum()  # This will return the number of negative values in the array
+    _arr.any()  # This will return True if any value in the array is True
+    _arr.all()  # This will return True if all values in the array are True
+    # These methods also work with non-Boolean arrays, where nonzero elements are treated as True.
+    return
+
+
+@app.cell
+def _(np):
+    # Unique and Other Set Logic
+
+    _names = np.array(["Bob", "Joe", "Will", "Bob", "Will", "Joe", "Joe"])
+    _unique_names = np.unique(_names)  # This will return the unique names in the array
+    _unique_names
+
+    # The unique function also returns the indices of the unique values in the original array
+    _unique_names, _indices = np.unique(
+        _names, return_index=True
+    )  # This will return the unique names and their indices in the original array
+
+    _unique_names, _indices, _inverse = np.unique(
+        _names, return_index=True, return_inverse=True
+    )  # This will return the unique names, their indices, and the inverse indices
+
+    _unique_names, _indices, _inverse, _counts = np.unique(
+        _names, return_index=True, return_inverse=True, return_counts=True
+    )  # This will return the unique names, their indices, the inverse indices, and the counts of each unique name
+
+    _unique_names, _indices, _inverse, _counts
+
+    # The inverse indices can be used to reconstruct the original array from the unique values
+    _reconstructed_names = _unique_names[_inverse]
+    _reconstructed_names
+
+    # Array set operations
+    # Method Description
+    # unique(x) Compute the sorted, unique elements in x
+    # intersect1d(x, y) Compute the sorted, common elements in x and y
+    # union1d(x, y) Compute the sorted union of elements
+    # in1d(x, y) Compute a Boolean array indicating whether each element of x is contained in y
+    # setdiff1d(x, y) Set difference, elements in x that are not in y
+    # setxor1d(x, y) Set symmetric differences; elements that are in either of the arrays, but not both
+    return
+
+
+@app.cell
+def _(np):
+    # File Input and Output with Arrays
+
+    _arr = np.arange(10)
+    np.save(
+        "my_array.npy", _arr
+    )  # This will save the array to a file in NumPy's binary format
+
+    _arr_loaded = np.load("my_array.npy")  # This will load the array from the file
+    _arr_loaded
+
+    # numpy.save and numpy.load are the two workhorse functions for efficiently saving
+    # and loading array data on disk. Arrays are saved by default in an uncompressed raw
+    # binary format with file extension .npy
+
+    np.savez(
+        "my_arrays.npz", a=_arr, b=_arr_loaded
+    )  # This will save multiple arrays to a single file in compressed format
+
+    _npz_file = np.load("my_arrays.npz")  # This will load the arrays from the file
+    _npz_file.files  # This will return the names of the arrays in the file
+    _npz_file["a"]  # This will return the array named "a" from the file
+    _npz_file["b"]  # This will return the array named "b" from the file
+    return
+
+
+@app.cell
+def _(np):
+    # Linear Algebra
+
+    from numpy.linalg import inv, qr, svd, solve
+
+    np.random.seed(34335)
+    _arr = np.random.standard_normal((3, 3))
+    _arr
+    _mat = (
+        _arr.T @ _arr
+    )  # This will compute the dot product of the transpose of _arr and _arr
+    _mat
+    inv(_mat)  # This will compute the inverse of the matrix
+    _mat @ inv(_mat)  # This will compute the dot product of the matrix and its inverse
+
+    # Commonly used numpy.linalg functions
+    # Function Description
+    # diag Return the diagonal (or off-diagonal) elements of a square matrix as a 1D array, or convert a 1D array into a
+    # square matrix with zeros on the off-diagonal
+    # dot Matrix multiplication
+    # trace Compute the sum of the diagonal elements
+    # det Compute the matrix determinant
+    # eig Compute the eigenvalues and eigenvectors of a square matrix
+    # inv Compute the inverse of a square matrix
+    # pinv Compute the Moore-Penrose pseudoinverse of a matrix
+    # qr Compute the QR decomposition
+    # svd Compute the singular value decomposition (SVD)
+    # solve Solve the linear system Ax = b for x, where A is a square matrix
+    # lstsq Compute the least-squares solution to Ax = b
+    return
+
+
+@app.cell
+def _(plt):
+    # Random Walks
+    import random
+
+    _pos = 0
+    _walk = [_pos]
+    _nsteps = 1000
+
+    for _ in range(_nsteps):
+        _step = 1 if random.randint(0, 1) else -1
+        _pos += _step
+        _walk.append(_pos)
+
+    plt.plot(_walk[:100])
     return
 
 
