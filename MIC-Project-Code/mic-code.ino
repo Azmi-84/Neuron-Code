@@ -9,7 +9,8 @@
 #define TAP_VALVE_ONE 4         // Digital output for tap solenoid valve between main tank and tap
 #define TAP_VALVE_TWO 5         // Digital output for tap solenoid valve between reservoir and tap
 
-#define TURBIDITY_THRESHOLD 300 // Threshold for turbidity sensor readings, have to be calibrated
+#define TURBIDITY_THRESHOLD_ONE 300 // Threshold for turbidity sensor readings, have to be calibrated
+#define TURBIDITY_THRESHOLD_TWO 300 // Threshold for turbidity sensor readings, have to be calibrated
 
 // Variable Definitions
 int bottomTurbidity = 0;  // Variable to store bottom turbidity sensor reading
@@ -36,6 +37,10 @@ void loop()
 {
     bottomTurbidity = analogRead(BOTTOM_TURBIDITY_PIN); // Read bottom turbidity sensor
     topTurbidity = analogRead(TOP_TURBIDITY_PIN);       // Read top turbidity sensor
+
+    bottomTurbidity = (float) bottomTurbidity * (5.0/1024.0)
+    topTurbidity = (float) bottomTurbidity * (5.0/1024.0)
+
 
     Serial.print("Bottom Turbidity: ");
     Serial.println(bottomTurbidity); // Print bottom turbidity reading
