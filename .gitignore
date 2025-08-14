@@ -6,3 +6,4 @@ requirements.txt
 .python-version
 Tutorials/07_Database_MongoDB/.env
 Tutorials/08_Database_MongoDB_GUI/.env
+.vscode/settings.json
