@@ -1,97 +1,115 @@
-// Turbidity Water Disposal System
+// Pin Configuration
+#define TURBIDITY_PIN A0
 
-// Pin Definitions
+// Motor Driver 1 (Motors 1 & 2)
+#define MOTOR_DRIVER_ONE_PIN_ONE 2
+#define MOTOR_DRIVER_ONE_PIN_TWO 3
+#define MOTOR_DRIVER_ONE_PIN_THREE 4
+#define MOTOR_DRIVER_ONE_PIN_FOUR 5
 
-#define BOTTOM_TURBIDITY_PIN A0 // Analog input for bottom turbidity sensor
-#define TOP_TURBIDITY_PIN A1    // Analog input for top turbidity sensor
-#define RESERVOIR_VALVE 2       // Digital output for reservoir solenoid valve and main tank
-#define DISPOSAL_VALVE 3        // Digital output for turbid water disposal solenoid valve and main tank
-#define TAP_VALVE_ONE 4         // Digital output for tap solenoid valve between main tank and tap
-#define TAP_VALVE_TWO 5         // Digital output for tap solenoid valve between reservoir and tap
+// Motor Driver 2 (Motors 3 & 4)
+#define MOTOR_DRIVER_TWO_PIN_ONE 6
+#define MOTOR_DRIVER_TWO_PIN_TWO 7
+#define MOTOR_DRIVER_TWO_PIN_THREE 8
+#define MOTOR_DRIVER_TWO_PIN_FOUR 9
 
-#define TURBIDITY_THRESHOLD_ONE 300 // Threshold for turbidity sensor readings, have to be calibrated
-#define TURBIDITY_THRESHOLD_TWO 300 // Threshold for turbidity sensor readings, have to be calibrated
+// Sensor Thresholds
+const int NULL_MIN = 625;
+const int NULL_MAX = 670;
 
-// Variable Definitions
-int bottomTurbidity = 0;  // Variable to store bottom turbidity sensor reading
-int topTurbidity = 0;     // Variable to store top turbidity sensor reading
-bool waterTurbid = false; // Flag to indicate if water is turbid
+const int CLEAN_MIN = 830;
+const int CLEAN_MAX = 855;
 
-void setup()
-{
-    // Initialize serial communication for debugging
-    Serial.begin(9600);
+const int TURBID_MIN = 725;
+const int TURBID_MAX = 755;
 
-    pinMode(RESERVOIR_VALVE, OUTPUT); // Set reservoir valve pin as output
-    pinMode(DISPOSAL_VALVE, OUTPUT);  // Set disposal valve pin as output
-    pinMode(TAP_VALVE_ONE, OUTPUT);   // Set tap valve one pin as output
-    pinMode(TAP_VALVE_TWO, OUTPUT);   // Set tap valve two pin as output
+int turbidity = 0;
 
-    // Close all valves at startup
-    closeAllValves();
+void setup() {
+  Serial.begin(115200);
 
-    Serial.println("Turbidity Water Disposal System Initialized");
+  setupMotorPins();
+  stopAllMotors();  // Ensure all motors are OFF at startup
 }
 
-void loop()
-{
-    bottomTurbidity = analogRead(BOTTOM_TURBIDITY_PIN); // Read bottom turbidity sensor
-    topTurbidity = analogRead(TOP_TURBIDITY_PIN);       // Read top turbidity sensor
-
-    bottomTurbidity = (float) bottomTurbidity * (5.0/1024.0)
-    topTurbidity = (float) bottomTurbidity * (5.0/1024.0)
-
-
-    Serial.print("Bottom Turbidity: ");
-    Serial.println(bottomTurbidity); // Print bottom turbidity reading
-    Serial.print("Top Turbidity: ");
-    Serial.println(topTurbidity); // Print top turbidity reading
-
-    // Check if water is turbid based on the threshold
-    if (bottomTurbidity > TURBIDITY_THRESHOLD || topTurbidity > TURBIDITY_THRESHOLD)
-    {
-        waterTurbid = true;
-        Serial.println("Water is turbid. Activating disposal system.");
-        handleTurbidWater(); // Handle turbid water disposal
-    }
-    else
-    {
-        waterTurbid = false;
-        Serial.println("Water is clear.");
-        handleClearWater(); // Handle clear water state
-    }
-    delay(1000); // Delay for 1 second before the next loop iteration
+// Pin Mode Setup
+void setupMotorPins() {
+  pinMode(MOTOR_DRIVER_ONE_PIN_ONE, OUTPUT); pinMode(MOTOR_DRIVER_ONE_PIN_TWO, OUTPUT);
+  pinMode(MOTOR_DRIVER_ONE_PIN_THREE, OUTPUT); pinMode(MOTOR_DRIVER_ONE_PIN_FOUR, OUTPUT);
+  pinMode(MOTOR_DRIVER_TWO_PIN_ONE, OUTPUT); pinMode(MOTOR_DRIVER_TWO_PIN_TWO, OUTPUT);
+  pinMode(MOTOR_DRIVER_TWO_PIN_THREE, OUTPUT); pinMode(MOTOR_DRIVER_TWO_PIN_FOUR, OUTPUT);
 }
 
-void handleTurbidWater()
-{
-    Serial.println("Turbid water detected - diverting to disposal tank.");
-
-    // Open turbid water disposal valve and tap valve two and close reservoir valve and tap valve one
-    digitalWrite(DISPOSAL_VALVE, HIGH);
-    digitalWrite(TAP_VALVE_TWO, HIGH);
-
-    digitalWrite(RESERVOIR_VALVE, LOW);
-    digitalWrite(TAP_VALVE_ONE, LOW);
+// Motor Control Helpers
+void stopMotor(int pin1, int pin2) {
+  digitalWrite(pin1, LOW);
+  digitalWrite(pin2, LOW);
 }
 
-void handleClearWater()
-{
-    Serial.println("Clear water detected - diverting to reservoir.");
-
-    // Open reservoir valve and tap valve one and close disposal valve and tap valve two
-    digitalWrite(RESERVOIR_VALVE, HIGH);
-    digitalWrite(TAP_VALVE_ONE, HIGH);
-
-    digitalWrite(DISPOSAL_VALVE, LOW);
-    digitalWrite(TAP_VALVE_TWO, LOW);
+void runMotorForward(int pin1, int pin2) {
+  digitalWrite(pin1, HIGH);
+  digitalWrite(pin2, LOW);
 }
 
-void closeAllValves()
-{
-    // Close all valves at startup
-    digitalWrite(RESERVOIR_VALVE, LOW);
-    digitalWrite(DISPOSAL_VALVE, LOW);
-    digitalWrite(TAP_VALVE_ONE, LOW);
-    digitalWrite(TAP_VALVE_TWO, LOW);
+void runMotorReverse(int pin1, int pin2) {
+  digitalWrite(pin1, LOW);
+  digitalWrite(pin2, HIGH);
+}
+
+void stopAllMotors() {
+  stopMotor(MOTOR_DRIVER_ONE_PIN_ONE, MOTOR_DRIVER_ONE_PIN_TWO);
+  stopMotor(MOTOR_DRIVER_ONE_PIN_THREE, MOTOR_DRIVER_ONE_PIN_FOUR);
+  stopMotor(MOTOR_DRIVER_TWO_PIN_ONE, MOTOR_DRIVER_TWO_PIN_TWO);
+  stopMotor(MOTOR_DRIVER_TWO_PIN_THREE, MOTOR_DRIVER_TWO_PIN_FOUR);
+}
+
+// Predefined States
+void onAllMotors() {
+  runMotorForward(MOTOR_DRIVER_ONE_PIN_ONE, MOTOR_DRIVER_ONE_PIN_TWO);
+  runMotorForward(MOTOR_DRIVER_ONE_PIN_THREE, MOTOR_DRIVER_ONE_PIN_FOUR);
+  runMotorForward(MOTOR_DRIVER_TWO_PIN_ONE, MOTOR_DRIVER_TWO_PIN_TWO);
+  runMotorForward(MOTOR_DRIVER_TWO_PIN_THREE, MOTOR_DRIVER_TWO_PIN_FOUR);
+}
+
+void onAllMotorsReverse() {
+  runMotorReverse(MOTOR_DRIVER_ONE_PIN_ONE, MOTOR_DRIVER_ONE_PIN_TWO);
+  runMotorReverse(MOTOR_DRIVER_ONE_PIN_THREE, MOTOR_DRIVER_ONE_PIN_FOUR);
+  runMotorReverse(MOTOR_DRIVER_TWO_PIN_ONE, MOTOR_DRIVER_TWO_PIN_TWO);
+  runMotorReverse(MOTOR_DRIVER_TWO_PIN_THREE, MOTOR_DRIVER_TWO_PIN_FOUR);
+}
+
+void loop() {
+  turbidity = analogRead(TURBIDITY_PIN);
+  Serial.print("Turbidity: ");
+  Serial.println(turbidity);
+  delay(500);
+
+  if (turbidity >= NULL_MIN && turbidity <= NULL_MAX) {
+    onAllMotors();
+  } 
+  else if (turbidity >= TURBID_MIN && turbidity <= TURBID_MAX) {
+    handleTurbidWater();
+  } 
+  else if (turbidity >= CLEAN_MIN && turbidity <= CLEAN_MAX) {
+    handleCleanWater();
+  } 
+  else {
+    Serial.println("Nothing to do!!!");
+    stopAllMotors();
+  }
+}
+
+// Condition Handlers
+void handleTurbidWater() {
+  runMotorForward(MOTOR_DRIVER_ONE_PIN_ONE, MOTOR_DRIVER_ONE_PIN_TWO);  // Motor 1 ON
+  runMotorForward(MOTOR_DRIVER_TWO_PIN_THREE, MOTOR_DRIVER_TWO_PIN_FOUR);  // Motor 4 ON
+  stopMotor(MOTOR_DRIVER_ONE_PIN_THREE, MOTOR_DRIVER_ONE_PIN_FOUR);        // Motor 2 OFF
+  stopMotor(MOTOR_DRIVER_TWO_PIN_ONE, MOTOR_DRIVER_TWO_PIN_TWO);        // Motor 3 OFF
+}
+
+void handleCleanWater() {
+  runMotorForward(MOTOR_DRIVER_ONE_PIN_THREE, MOTOR_DRIVER_ONE_PIN_FOUR);  // Motor 2 ON
+  runMotorForward(MOTOR_DRIVER_TWO_PIN_ONE, MOTOR_DRIVER_TWO_PIN_TWO);  // Motor 3 ON
+  stopMotor(MOTOR_DRIVER_ONE_PIN_ONE, MOTOR_DRIVER_ONE_PIN_TWO);        // Motor 1 OFF
+  stopMotor(MOTOR_DRIVER_TWO_PIN_THREE, MOTOR_DRIVER_TWO_PIN_FOUR);        // Motor 4 OFF
 }
