@@ -63,7 +63,7 @@ def _(mo):
     return
 
 
-@app.cell(hide_code=True)
+@app.cell
 def _():
     import marimo as mo
     import numpy as np
@@ -73,7 +73,7 @@ def _():
     return CP, mo, plt
 
 
-@app.cell(hide_code=True)
+@app.cell
 def _(CP):
     def get_state_properties_from_TP(T, P, fluid):
         """
@@ -86,7 +86,7 @@ def _(CP):
     return (get_state_properties_from_TP,)
 
 
-@app.cell(hide_code=True)
+@app.cell
 def _(CP):
     def get_state_properties_from_Ps(P, s, fluid):
         """
@@ -99,7 +99,7 @@ def _(CP):
     return (get_state_properties_from_Ps,)
 
 
-@app.cell(hide_code=True)
+@app.cell
 def _(CP):
     def get_state_properties_from_hP(h, P, fluid):
         """
@@ -112,7 +112,7 @@ def _(CP):
     return (get_state_properties_from_hP,)
 
 
-@app.cell(hide_code=True)
+@app.cell
 def _(
     CP,
     get_state_properties_from_Ps,
@@ -286,7 +286,7 @@ def _(
     return (results,)
 
 
-@app.cell(hide_code=True)
+@app.cell
 def _(results):
     # Print results
     print("Cycle Analysis Results:")
@@ -297,7 +297,7 @@ def _(results):
     return
 
 
-@app.cell(hide_code=True)
+@app.cell
 def _(plt):
     def plot_ts_diagram(analysis_results):
         """Generates and displays a T-s diagram from analysis results."""
@@ -375,7 +375,7 @@ def _(plt):
     return (plot_ts_diagram,)
 
 
-@app.cell(hide_code=True)
+@app.cell
 def _(plot_ts_diagram, results):
     # Generate and show the T-s diagram
     plot_ts_diagram(results)
