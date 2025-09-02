@@ -70,10 +70,10 @@ def _():
     import pandas as pd
     import matplotlib.pyplot as plt
     import CoolProp.CoolProp as CP
-    return CP, mo, plt
+    return CP, mo, pd, plt
 
 
-@app.cell
+@app.cell(hide_code=True)
 def _(CP):
     def get_state_properties_from_TP(T, P, fluid):
         """
@@ -86,7 +86,7 @@ def _(CP):
     return (get_state_properties_from_TP,)
 
 
-@app.cell
+@app.cell(hide_code=True)
 def _(CP):
     def get_state_properties_from_Ps(P, s, fluid):
         """
@@ -99,7 +99,7 @@ def _(CP):
     return (get_state_properties_from_Ps,)
 
 
-@app.cell
+@app.cell(hide_code=True)
 def _(CP):
     def get_state_properties_from_hP(h, P, fluid):
         """
@@ -112,7 +112,7 @@ def _(CP):
     return (get_state_properties_from_hP,)
 
 
-@app.cell
+@app.cell(hide_code=True)
 def _(
     CP,
     get_state_properties_from_Ps,
@@ -193,7 +193,7 @@ def _(
     return (brayton_cycle_analysis,)
 
 
-@app.cell
+@app.cell(hide_code=True)
 def _(mo):
     pressure_ratio_slider = mo.ui.slider(
         start=8,
@@ -245,7 +245,7 @@ def _(
     return
 
 
-@app.cell
+@app.cell(hide_code=True)
 def _(
     pressure_ratio_slider,
     regenerator_effectiveness_slider,
@@ -262,7 +262,7 @@ def _(
     return P1_in, Pr_in, T1_in, T3_in, eff_c_in, eff_r_in, eff_t_in, fluid_in
 
 
-@app.cell
+@app.cell(hide_code=True)
 def _(
     P1_in,
     Pr_in,
@@ -287,18 +287,28 @@ def _(
     return (results,)
 
 
-@app.cell
-def _(results):
-    # Print results
-    print("Cycle Analysis Results:")
-    print(f"Net Work (w_net): {results['metrics']['w_net']:.2f} J/kg")
-    print(f"Heat Input (q_in): {results['metrics']['q_in']:.2f} J/kg")
-    print(f"Thermal Efficiency: {results['metrics']['thermal_eff']:.2f}%")
-    print(f"Back Work Ratio: {results['metrics']['back_work_ratio']:.2f}")
+@app.cell(hide_code=True)
+def _(pd, results):
+    # Create a DataFrame from the state data for display
+    table_data = []
+    for state_name, properties in results["states"].items():
+        row = {
+            "State": state_name,
+            "Temperature (K)": f"{properties['T']:.2f}",
+            "Pressure (kPa)": f"{properties['P'] / 1000:.2f}",
+            "Enthalpy (kJ/kg)": f"{properties['h'] / 1000:.2f}",
+            "Entropy (kJ/kg·K)": f"{properties['s'] / 1000:.2f}",
+        }
+        table_data.append(row)
+
+    df_states = pd.DataFrame(table_data).set_index("State")
+
+    # Display the table
+    df_states
     return
 
 
-@app.cell
+@app.cell(hide_code=True)
 def _(plt):
     def plot_ts_diagram(analysis_results):
         """Generates and displays a T-s diagram from analysis results."""
@@ -374,135 +384,28 @@ def _(plt):
     return (plot_ts_diagram,)
 
 
-@app.cell
+@app.cell(hide_code=True)
+def _(mo, results):
+    mo.vstack(
+        [
+            mo.md("## Cycle Analysis Results:"),
+            mo.md(f"### Net Work (w_net): {results['metrics']['w_net']:.2f} J/kg"),
+            mo.md(f"### Heat Input (q_in): {results['metrics']['q_in']:.2f} J/kg"),
+            mo.md(
+                f"### Thermal Efficiency: {results['metrics']['thermal_eff']:.2f}%"
+            ),
+            mo.md(
+                f"### Back Work Ratio: {results['metrics']['back_work_ratio']:.2f}"
+            ),
+        ]
+    )
+    return
+
+
+@app.cell(hide_code=True)
 def _(plot_ts_diagram, results):
     # Generate and show the T-s diagram
     plot_ts_diagram(results)
-    return
-
-
-@app.cell
-def _(CP):
-    def calculate_saturated_liquid_state(P, fluid):
-        h = CP.PropsSI("H", "P", P, "Q", 0, fluid)
-        s = CP.PropsSI("S", "P", P, "Q", 0, fluid)
-        d = CP.PropsSI("D", "P", P, "Q", 0, fluid)
-        v = 1 / d
-        T = CP.PropsSI("T", "P", P, "Q", 0, fluid)
-        return {"P": P, "T": T, "h": h, "s": s, "v": v}
-    return (calculate_saturated_liquid_state,)
-
-
-@app.cell
-def _(CP):
-    def calculate_saturated_vapor_state(P, fluid):
-        h = CP.PropsSI("H", "P", P, "Q", 1, fluid)
-        s = CP.PropsSI("S", "P", P, "Q", 1, fluid)
-        d = CP.PropsSI("D", "P", P, "Q", 1, fluid)
-        v = 1 / d
-        T = CP.PropsSI("T", "P", P, "Q", 1, fluid)
-        return {"P": P, "T": T, "h": h, "s": s, "v": v}
-    return
-
-
-@app.cell
-def _(CP, T):
-    def calculate_superheated_vapor_state(P, fluid):
-        h = CP.PropsSI("H", "P", P, "T", T, fluid)
-        s = CP.PropsSI("S", "P", P, "T", T, fluid)
-        d = CP.PropsSI("D", "P", P, "T", T, fluid)
-        v = 1 / d
-        return {"P": P, "T": T, "h": h, "s": s, "v": v}
-    return
-
-
-@app.cell
-def _(CP):
-    def pump_outlet(state_in, P_out, eff_pump, fluid):
-        h_in = state_in["h"]
-        v_in = state_in["v"]
-        P_in = state_in["P"]
-        w_pump = v_in * (P_out - P_in) / eff_pump
-        h_out = h_in + w_pump
-        s_out = CP.PropsSI("S", "H", h_out, "P", P_out, fluid)
-        T_out = CP.PropsSI("T", "H", h_out, "P", P_out, fluid)
-        d_out = CP.PropsSI("D", "P", P_out, "H", h_out, fluid)
-        v_out = 1 / d_out
-        return {"P": P_out, "T": T_out, "h": h_out, "s": s_out, "v": v_out}
-    return (pump_outlet,)
-
-
-@app.cell
-def _(CP):
-    def boiler_outlet(P, T, fluid):
-        h = CP.PropsSI("H", "P", P, "T", T, fluid)
-        s = CP.PropsSI("S", "P", P, "T", T, fluid)
-        d = CP.PropsSI("D", "P", P, "T", T, fluid)
-        v = 1 / d
-        return {"P": P, "T": T, "h": h, "s": s, "v": v}
-    return
-
-
-@app.cell
-def _(CP):
-    def hrsg_energy_exergy_analysis(
-        m_gas, state_gas_in, state_gas_out, m_steam, state_water_in, P_max
-    ):
-        """
-        HRSG analysis for combined cycle.
-
-        Parameters:
-        m_gas: mass flow rate of exhaust gas (kg/s)
-        cp_gas: specific heat capacity of exhaust gas (J/kg-K)
-        T_gas_in: inlet temperature of exhaust gas (K)
-        T_gas_out: outlet temperature of exhaust gas (K)
-        m_steam: mass flow rate of steam generated (kg/s)
-        h_steam_out: enthalpy of produced steam (J/kg)
-        h_water_in: enthalpy of water entering HRSG (J/kg)
-        T_steam_gen: temperature at which steam is generated (K)
-        T_env: environment temperature (K)
-
-        Returns:
-        Q_hrsg: Heat transferred from exhaust gas to steam (W)
-        Q_steam: Heat gained by water/steam side (W)
-        E_destroyed: Exergy destroyed in HRSG (W)
-        """
-
-        # Energy transferred from gas side
-        Q_hrsg = m_gas * (state_gas_in["h"] - state_gas_out["h"])
-
-        # Energy gained by steam side
-        h_steam_out = Q_hrsg / m_steam + state_water_in["h_out"]
-        T_steam_out = CP.PropsSI("T", "H", h_steam_out, "P", P_max)
-
-        return Q_hrsg, h_steam_out, T_steam_out
-    return (hrsg_energy_exergy_analysis,)
-
-
-@app.cell
-def _(
-    calculate_saturated_liquid_state,
-    hrsg_energy_exergy_analysis,
-    pump_outlet,
-    results,
-):
-    def rankine_cycle_analysis(
-        P_max, P_min, eff_pump, m_gas, m_steam, T_exhaust_gas, fluid
-    ):
-        states = results["states"]
-        # State 7 (Saturated Liquid)
-        state7 = calculate_saturated_liquid_state(P_min, fluid)
-
-        # State 8 (After the pump)
-        state8 = pump_outlet(state7, P_max, eff_pump, fluid)
-
-        # State 9 (After heat exchanger)
-        state9 = hrsg_energy_exergy_analysis(
-            m_gas, states["6"], states["7"], m_steam, state8, P_max
-        )
-
-        # State 10 (After high pressure turbine)
-    
     return
 
 
