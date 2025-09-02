@@ -187,7 +187,7 @@ def _(
                 "q_in": q_in,
                 "thermal_eff": thermal_eff,
                 "back_work_ratio": back_work_ratio,
-                'exhaust-gas-temperature': state6['T']
+                "exhaust-gas-temperature": state6["T"],
             },
         }
     return (brayton_cycle_analysis,)
@@ -197,7 +197,7 @@ def _(
 def _(mo):
     pressure_ratio_slider = mo.ui.slider(
         start=8,
-        stop=30,
+        stop=25,
         step=1,
         show_value=True,
         full_width=True,
@@ -206,7 +206,7 @@ def _(mo):
 
     turbine_inlet_temperature_slider = mo.ui.slider(
         start=1200,
-        stop=1600,
+        stop=1700,
         step=50,
         show_value=True,
         full_width=True,
@@ -366,9 +366,7 @@ def _(plt):
         # Set plot aesthetics
         ax.set_xlabel("Entropy, s (J/kg·K)", fontsize=12)
         ax.set_ylabel("Temperature, T (K)", fontsize=12)
-        ax.set_title(
-            "T-s Diagram of a Regenerative Brayton Cycle", fontsize=14
-        )
+        ax.set_title("T-s Diagram of a Regenerative Brayton Cycle", fontsize=14)
         ax.grid(True, linestyle="--", alpha=0.6)
         ax.legend()
         plt.tight_layout()
@@ -392,7 +390,7 @@ def _(CP):
         v = 1 / d
         T = CP.PropsSI("T", "P", P, "Q", 0, fluid)
         return {"P": P, "T": T, "h": h, "s": s, "v": v}
-    return
+    return (calculate_saturated_liquid_state,)
 
 
 @app.cell
@@ -420,6 +418,22 @@ def _(CP, T):
 
 @app.cell
 def _(CP):
+    def pump_outlet(state_in, P_out, eff_pump, fluid):
+        h_in = state_in["h"]
+        v_in = state_in["v"]
+        P_in = state_in["P"]
+        w_pump = v_in * (P_out - P_in) / eff_pump
+        h_out = h_in + w_pump
+        s_out = CP.PropsSI("S", "H", h_out, "P", P_out, fluid)
+        T_out = CP.PropsSI("T", "H", h_out, "P", P_out, fluid)
+        d_out = CP.PropsSI("D", "P", P_out, "H", h_out, fluid)
+        v_out = 1 / d_out
+        return {"P": P_out, "T": T_out, "h": h_out, "s": s_out, "v": v_out}
+    return (pump_outlet,)
+
+
+@app.cell
+def _(CP):
     def boiler_outlet(P, T, fluid):
         h = CP.PropsSI("H", "P", P, "T", T, fluid)
         s = CP.PropsSI("S", "P", P, "T", T, fluid)
@@ -429,21 +443,67 @@ def _(CP):
     return
 
 
-app._unparsable_cell(
-    r"""
-    def open_feed_water_heater():
-    """,
-    name="_"
-)
+@app.cell
+def _(CP):
+    def hrsg_energy_exergy_analysis(
+        m_gas, state_gas_in, state_gas_out, m_steam, state_water_in, P_max
+    ):
+        """
+        HRSG analysis for combined cycle.
+
+        Parameters:
+        m_gas: mass flow rate of exhaust gas (kg/s)
+        cp_gas: specific heat capacity of exhaust gas (J/kg-K)
+        T_gas_in: inlet temperature of exhaust gas (K)
+        T_gas_out: outlet temperature of exhaust gas (K)
+        m_steam: mass flow rate of steam generated (kg/s)
+        h_steam_out: enthalpy of produced steam (J/kg)
+        h_water_in: enthalpy of water entering HRSG (J/kg)
+        T_steam_gen: temperature at which steam is generated (K)
+        T_env: environment temperature (K)
+
+        Returns:
+        Q_hrsg: Heat transferred from exhaust gas to steam (W)
+        Q_steam: Heat gained by water/steam side (W)
+        E_destroyed: Exergy destroyed in HRSG (W)
+        """
+
+        # Energy transferred from gas side
+        Q_hrsg = m_gas * (state_gas_in["h"] - state_gas_out["h"])
+
+        # Energy gained by steam side
+        h_steam_out = Q_hrsg / m_steam + state_water_in["h_out"]
+        T_steam_out = CP.PropsSI("T", "H", h_steam_out, "P", P_max)
+
+        return Q_hrsg, h_steam_out, T_steam_out
+    return (hrsg_energy_exergy_analysis,)
 
 
-app._unparsable_cell(
-    r"""
-    def rankine_cycle_analysis():
+@app.cell
+def _(
+    calculate_saturated_liquid_state,
+    hrsg_energy_exergy_analysis,
+    pump_outlet,
+    results,
+):
+    def rankine_cycle_analysis(
+        P_max, P_min, eff_pump, m_gas, m_steam, T_exhaust_gas, fluid
+    ):
+        states = results["states"]
+        # State 7 (Saturated Liquid)
+        state7 = calculate_saturated_liquid_state(P_min, fluid)
 
-    """,
-    name="_"
-)
+        # State 8 (After the pump)
+        state8 = pump_outlet(state7, P_max, eff_pump, fluid)
+
+        # State 9 (After heat exchanger)
+        state9 = hrsg_energy_exergy_analysis(
+            m_gas, states["6"], states["7"], m_steam, state8, P_max
+        )
+
+        # State 10 (After high pressure turbine)
+    
+    return
 
 
 if __name__ == "__main__":
