@@ -187,6 +187,7 @@ def _(
                 "q_in": q_in,
                 "thermal_eff": thermal_eff,
                 "back_work_ratio": back_work_ratio,
+                'exhaust-gas-temperature': state6['T']
             },
         }
     return (brayton_cycle_analysis,)
@@ -426,6 +427,23 @@ def _(CP):
         v = 1 / d
         return {"P": P, "T": T, "h": h, "s": s, "v": v}
     return
+
+
+app._unparsable_cell(
+    r"""
+    def open_feed_water_heater():
+    """,
+    name="_"
+)
+
+
+app._unparsable_cell(
+    r"""
+    def rankine_cycle_analysis():
+
+    """,
+    name="_"
+)
 
 
 if __name__ == "__main__":
