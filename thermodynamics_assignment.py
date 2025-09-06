@@ -8,7 +8,7 @@
 import marimo
 
 __generated_with = "0.15.2"
-app = marimo.App(width="full")
+app = marimo.App(width="full", auto_download=["html"])
 
 
 @app.cell(hide_code=True)
@@ -65,15 +65,16 @@ def _(mo):
 
 @app.cell
 def _():
+    import math
     import marimo as mo
     import numpy as np
     import pandas as pd
     import matplotlib.pyplot as plt
     import CoolProp.CoolProp as CP
-    return CP, mo, pd, plt
+    return CP, math, mo, np, pd, plt
 
 
-@app.cell(hide_code=True)
+@app.cell
 def _(CP):
     def get_state_properties_from_TP(T, P, fluid):
         """
@@ -86,7 +87,7 @@ def _(CP):
     return (get_state_properties_from_TP,)
 
 
-@app.cell(hide_code=True)
+@app.cell
 def _(CP):
     def get_state_properties_from_Ps(P, s, fluid):
         """
@@ -99,7 +100,7 @@ def _(CP):
     return (get_state_properties_from_Ps,)
 
 
-@app.cell(hide_code=True)
+@app.cell
 def _(CP):
     def get_state_properties_from_hP(h, P, fluid):
         """
@@ -112,64 +113,96 @@ def _(CP):
     return (get_state_properties_from_hP,)
 
 
-@app.cell(hide_code=True)
+@app.cell
 def _(
     CP,
     get_state_properties_from_Ps,
     get_state_properties_from_TP,
     get_state_properties_from_hP,
+    math,
 ):
     def brayton_cycle_analysis(
-        T1, P1, Pr, T3, fluid, eff_compressor, eff_turbine, effictiveness
+        T1, P1, Pr, T5, fluid, eff_compressor, eff_turbine, effectiveness
     ):
-        # State 1 (T, P are given)
+        # State 1: Initial conditions (inlet to first compressor)
         state1 = get_state_properties_from_TP(T1, P1, fluid)
 
-        # State 2s (P and s from state 1)
-        P2 = Pr * P1
+        # State 2s: Isentropic compression (first stage)
+        P2 = math.sqrt(Pr) * P1
         state2s = get_state_properties_from_Ps(P2, state1["s"], fluid)
-
-        # State 2a (Actual state after compressor)
+        # State 2a: Actual compression with isentropic efficiency
         h2a = state1["h"] + (state2s["h"] - state1["h"]) / eff_compressor
-        # To find T and s at state 2a, we need h and P
         T2a = CP.PropsSI("T", "H", h2a, "P", P2, fluid)
         s2a = CP.PropsSI("S", "H", h2a, "P", P2, fluid)
         state2a = {"T": T2a, "P": P2, "h": h2a, "s": s2a, "fluid": fluid}
 
-        # State 3 (T, P are given)
+        # State 3: After intercooling (T3 equals inlet temperature T1, P3 equals P2)
+        T3 = T1
         P3 = P2
         state3 = get_state_properties_from_TP(T3, P3, fluid)
 
-        # State 4s (P and s from state 3)
-        P4 = P1
+        # State 4s: Isentropic compression (second stage)
+        P4 = math.sqrt(Pr) * P3
         state4s = get_state_properties_from_Ps(P4, state3["s"], fluid)
-
-        # State 4a (Actual state after turbine)
-        h4a = state3["h"] - eff_turbine * (state3["h"] - state4s["h"])
-        # To find T and s at state 4a, we need h and P
+        # State 4a: Actual compression after 2nd stage
+        h4a = state3["h"] + (state4s["h"] - state3["h"]) / eff_compressor
         T4a = CP.PropsSI("T", "H", h4a, "P", P4, fluid)
         s4a = CP.PropsSI("S", "H", h4a, "P", P4, fluid)
         state4a = {"T": T4a, "P": P4, "h": h4a, "s": s4a, "fluid": fluid}
 
-        # State 5 (after regeneration)
-        h5 = state2a["h"] + effictiveness * (state4a["h"] - state2a["h"])
-        # To find T and s at state 5, we need h and P
-        T5 = CP.PropsSI("T", "H", h5, "P", P2, fluid)
-        s5 = CP.PropsSI("S", "H", h5, "P", P2, fluid)
-        state5 = {"T": T5, "P": P2, "h": h5, "s": s5, "fluid": fluid}
+        # State 5: After first heat addition (first turbine inlet)
+        P5 = P4
+        state5 = get_state_properties_from_TP(T5, P5, fluid)
 
-        # State 6 (After regeneration - heat rejected)
-        # Heat absorbed by cold fluid = Heat rejected by hot fluid
-        h6 = state4a["h"] - (state5["h"] - state2a["h"])
-        state6 = get_state_properties_from_hP(h6, P1, fluid)
+        # State 6s: Isentropic expansion (first turbine stage)
+        P6 = P5 / math.sqrt(Pr)
+        state6s = get_state_properties_from_Ps(P6, state5["s"], fluid)
+        # State 6a: Actual expansion (first turbine, with efficiency)
+        h6a = state5["h"] - eff_turbine * (state5["h"] - state6s["h"])
+        T6a = CP.PropsSI("T", "H", h6a, "P", P6, fluid)
+        s6a = CP.PropsSI("S", "H", h6a, "P", P6, fluid)
+        state6a = {"T": T6a, "P": P6, "h": h6a, "s": s6a, "fluid": fluid}
 
-        # Calculate cycle performance metrics
-        w_net = (state3["h"] - state4a["h"]) - (state2a["h"] - state1["h"])
-        q_in = state3["h"] - state5["h"]
+        # State 7: Second heat addition (second turbine inlet, reheat)
+        P7 = P6
+        T7 = T5
+        state7 = get_state_properties_from_TP(T7, P7, fluid)
+
+        # State 8s: Isentropic expansion (second turbine stage)
+        P8 = P7 / math.sqrt(Pr)
+        state8s = get_state_properties_from_Ps(P8, state7["s"], fluid)
+        # State 8a: Actual expansion (second turbine, with efficiency)
+        h8a = state7["h"] - eff_turbine * (state7["h"] - state8s["h"])
+        T8a = CP.PropsSI("T", "H", h8a, "P", P8, fluid)
+        s8a = CP.PropsSI("S", "H", h8a, "P", P8, fluid)
+        state8a = {"T": T8a, "P": P8, "h": h8a, "s": s8a, "fluid": fluid}
+
+        # State 9: Regeneration—preheated air before main combustor (using effectiveness)
+        h9 = state4a["h"] + effectiveness * (state8a["h"] - state4a["h"])
+        T9 = CP.PropsSI("T", "H", h9, "P", P4, fluid)
+        s9 = CP.PropsSI("S", "H", h9, "P", P4, fluid)
+        state9 = {"T": T9, "P": P4, "h": h9, "s": s9, "fluid": fluid}
+
+        # State 10: Air after heat rejected in regenerator
+        h10 = state8a["h"] - (state9["h"] - state4a["h"])
+        state10 = get_state_properties_from_hP(h10, P1, fluid)
+
+        # Net specific work output
+        w_comp = (state2a["h"] - state1["h"]) + (state4a["h"] - state3["h"])
+        w_turb = (state5["h"] - state6a["h"]) + (state7["h"] - state8a["h"])
+        w_net = w_turb - w_comp
+
+        # Total heat input (Q_in)
+        q_in = (state5["h"] - state9["h"]) + (state7["h"] - state6a["h"])
+
+        # Cycle thermal efficiency (%)
         thermal_eff = (w_net / q_in) * 100
-        back_work_ratio = (state2a["h"] - state1["h"]) / (
-            state3["h"] - state4a["h"]
-        )
+
+        # Back work ratio (fraction of turbine output consumed by compressor)
+        back_work_ratio = w_comp / w_turb
+
+        # Exhaust gas temperature after last turbine stage
+        exhaust_gas_temperature = state10["T"]
 
         return {
             "states": {
@@ -180,25 +213,31 @@ def _(
                 "4s": state4s,
                 "4a": state4a,
                 "5": state5,
-                "6": state6,
+                "6s": state6s,
+                "6a": state6a,
+                "7": state7,
+                "8s": state8s,
+                "8a": state8a,
+                "9": state9,
+                "10": state10,
             },
             "metrics": {
                 "w_net": w_net,
                 "q_in": q_in,
                 "thermal_eff": thermal_eff,
                 "back_work_ratio": back_work_ratio,
-                "exhaust-gas-temperature": state6["T"],
+                "exhaust_gas_temperature": exhaust_gas_temperature,
             },
         }
     return (brayton_cycle_analysis,)
 
 
-@app.cell(hide_code=True)
+@app.cell
 def _(mo):
     pressure_ratio_slider = mo.ui.slider(
         start=8,
         stop=25,
-        step=1,
+        step=0.5,
         show_value=True,
         full_width=True,
         label="Pressure Ratio",
@@ -213,44 +252,31 @@ def _(mo):
         label="Turbine Inlet Temperature",
     )
 
-    regenerator_effectiveness_slider = mo.ui.slider(
-        start=0.45,
-        stop=0.90,
-        step=0.1,
-        show_value=True,
-        full_width=True,
-        label="Regenerator Effectiveness",
-    )
-    return (
-        pressure_ratio_slider,
-        regenerator_effectiveness_slider,
-        turbine_inlet_temperature_slider,
-    )
+    # regenerator_effectiveness_slider = mo.ui.slider(
+    #     start=0.45,
+    #     stop=0.90,
+    #     step=0.1,
+    #     show_value=True,
+    #     full_width=True,
+    #     label="Regenerator Effectiveness",
+    # )
+    return pressure_ratio_slider, turbine_inlet_temperature_slider
 
 
 @app.cell
-def _(
-    mo,
-    pressure_ratio_slider,
-    regenerator_effectiveness_slider,
-    turbine_inlet_temperature_slider,
-):
+def _(mo, pressure_ratio_slider, turbine_inlet_temperature_slider):
     mo.vstack(
         [
             pressure_ratio_slider,
             turbine_inlet_temperature_slider,
-            regenerator_effectiveness_slider,
+            # regenerator_effectiveness_slider,
         ]
     )
     return
 
 
-@app.cell(hide_code=True)
-def _(
-    pressure_ratio_slider,
-    regenerator_effectiveness_slider,
-    turbine_inlet_temperature_slider,
-):
+@app.cell
+def _(pressure_ratio_slider, turbine_inlet_temperature_slider):
     T1_in = 300  # K
     P1_in = 101325  # Pa
     Pr_in = pressure_ratio_slider  # Pressure ratio
@@ -258,11 +284,11 @@ def _(
     fluid_in = "Air"
     eff_c_in = 0.88  # Compressor efficiency
     eff_t_in = 0.92  # Turbine efficiency
-    eff_r_in = regenerator_effectiveness_slider  # Regenerator effectiveness
+    eff_r_in = 0.9  # regenerator_effectiveness_slider  # Regenerator effectiveness
     return P1_in, Pr_in, T1_in, T3_in, eff_c_in, eff_r_in, eff_t_in, fluid_in
 
 
-@app.cell(hide_code=True)
+@app.cell
 def _(
     P1_in,
     Pr_in,
@@ -282,12 +308,12 @@ def _(
         fluid_in,
         eff_c_in,
         eff_t_in,
-        eff_r_in.value,
+        eff_r_in,  # .value,
     )
     return (results,)
 
 
-@app.cell(hide_code=True)
+@app.cell
 def _(pd, results):
     # Create a DataFrame from the state data for display
     table_data = []
@@ -308,83 +334,117 @@ def _(pd, results):
     return
 
 
-@app.cell(hide_code=True)
+@app.cell
 def _(plt):
     def plot_ts_diagram(analysis_results):
-        """Generates and displays a T-s diagram from analysis results."""
         states = analysis_results["states"]
 
-        # Extracting points for plotting
+        # Actual cycle points (using relevant key sequence)
+        s_actual = [
+            states["1"]["s"] / 1000,
+            states["2a"]["s"] / 1000,
+            states["3"]["s"] / 1000,
+            states["4a"]["s"] / 1000,
+            states["9"]["s"] / 1000,
+            states["5"]["s"] / 1000,
+            states["6a"]["s"] / 1000,
+            states["7"]["s"] / 1000,
+            states["8a"]["s"] / 1000,
+            states["10"]["s"] / 1000,
+            states["1"]["s"] / 1000,
+        ]
         T_actual = [
             states["1"]["T"],
             states["2a"]["T"],
-            states["5"]["T"],
             states["3"]["T"],
             states["4a"]["T"],
-            states["6"]["T"],
+            states["9"]["T"],
+            states["5"]["T"],
+            states["6a"]["T"],
+            states["7"]["T"],
+            states["8a"]["T"],
+            states["10"]["T"],
             states["1"]["T"],
         ]
-        s_actual = [
-            states["1"]["s"],
-            states["2a"]["s"],
-            states["5"]["s"],
-            states["3"]["s"],
-            states["4a"]["s"],
-            states["6"]["s"],
-            states["1"]["s"],
+
+        # Ideal compressor and turbine expansion
+        s_ideal = [
+            states["1"]["s"] / 1000,
+            states["2s"]["s"] / 1000,
+            states["3"]["s"] / 1000,
+            states["4s"]["s"] / 1000,
+            states["5"]["s"] / 1000,
+            states["6s"]["s"] / 1000,
+            states["7"]["s"] / 1000,
+            states["8s"]["s"] / 1000,
+            states["1"]["s"] / 1000,
+        ]
+        T_ideal = [
+            states["1"]["T"],
+            states["2s"]["T"],
+            states["3"]["T"],
+            states["4s"]["T"],
+            states["5"]["T"],
+            states["6s"]["T"],
+            states["7"]["T"],
+            states["8s"]["T"],
+            states["1"]["T"],
         ]
 
-        # Extracting points for ideal processes
-        T_ideal_comp = [states["1"]["T"], states["2s"]["T"]]
-        s_ideal_comp = [states["1"]["s"], states["2s"]["s"]]
-        T_ideal_turb = [states["3"]["T"], states["4s"]["T"]]
-        s_ideal_turb = [states["3"]["s"], states["4s"]["s"]]
+        fig, ax = plt.subplots(figsize=(10, 7))
 
-        fig, ax = plt.subplots(figsize=(10, 8))
-
-        # Plot the actual cycle (solid blue line)
-        ax.plot(s_actual, T_actual, "b-o", linewidth=2, label="Actual Cycle")
-
-        # Plot the ideal compressor and turbine processes (dashed black lines)
+        # Actual cycle: solid blue
         ax.plot(
-            s_ideal_comp, T_ideal_comp, "k--", linewidth=1, label="Ideal Processes"
+            s_actual,
+            T_actual,
+            "b-o",
+            linewidth=2,
+            markersize=6,
+            label="Actual States",
         )
-        ax.plot(s_ideal_turb, T_ideal_turb, "k--", linewidth=1)
 
-        # Label all state points
-        points_to_label = [
-            ("1", states["1"]),
-            ("2a", states["2a"]),
-            ("2s", states["2s"]),
-            ("3", states["3"]),
-            ("4a", states["4a"]),
-            ("4s", states["4s"]),
-            ("5", states["5"]),
-            ("6", states["6"]),
-        ]
+        # Ideal cycle: dashed red
+        ax.plot(
+            s_ideal,
+            T_ideal,
+            "r--s",
+            linewidth=2,
+            markersize=6,
+            label="Ideal States (Isentropic)",
+        )
 
-        for label, state in points_to_label:
+        # Label actual states
+        state_labels = ["1", "2a", "3", "4a", "9", "5", "6a", "7", "8a", "10", "1"]
+        for s, T, label in zip(s_actual, T_actual, state_labels):
             ax.text(
-                state["s"],
-                state["T"],
-                f"  {label}",
-                fontsize=12,
+                s,
+                T,
+                f" {label}",
+                fontsize=11,
                 ha="left",
                 va="bottom",
+                color="blue",
             )
 
-        # Set plot aesthetics
-        ax.set_xlabel("Entropy, s (J/kg·K)", fontsize=12)
-        ax.set_ylabel("Temperature, T (K)", fontsize=12)
-        ax.set_title("T-s Diagram of a Regenerative Brayton Cycle", fontsize=14)
+        # Label ideal states
+        ideal_labels = ["1", "2s", "3", "4s", "5", "6s", "7", "8s", "1"]
+        for s, T, label in zip(s_ideal, T_ideal, ideal_labels):
+            ax.text(
+                s, T, f" {label}", fontsize=11, ha="right", va="top", color="red"
+            )
+
+        # Axis, title, legend
+        ax.set_xlabel("Entropy, $s$ (kJ/kg·K)", fontsize=13)
+        ax.set_ylabel("Temperature, $T$ (K)", fontsize=13)
+        ax.set_title("T-s Diagram: Brayton Cycle (Ideal vs. Actual)", fontsize=16)
         ax.grid(True, linestyle="--", alpha=0.6)
-        ax.legend()
+        ax.legend(loc="best", fontsize=12)
         plt.tight_layout()
         plt.show()
     return (plot_ts_diagram,)
 
 
-@app.cell(hide_code=True)
+@app.cell
 def _(mo, results):
     mo.vstack(
         [
@@ -406,6 +466,243 @@ def _(mo, results):
 def _(plot_ts_diagram, results):
     # Generate and show the T-s diagram
     plot_ts_diagram(results)
+    return
+
+
+@app.cell
+def _(brayton_cycle_analysis, np):
+    def sweep_efficiency(
+        pr_range, t_inlet_range, fluid, eff_c, eff_t, eff_r, T1=300, P1=101325
+    ):
+        eff_map = np.zeros((len(pr_range), len(t_inlet_range)))
+        for i, pr in enumerate(pr_range):
+            for j, t_inlet in enumerate(t_inlet_range):
+                results = brayton_cycle_analysis(
+                    T1=T1,
+                    P1=P1,
+                    Pr=pr,
+                    T5=t_inlet,
+                    fluid=fluid,
+                    eff_compressor=eff_c,
+                    eff_turbine=eff_t,
+                    effectiveness=eff_r,
+                )
+                eff_map[i, j] = results["metrics"]["thermal_eff"]
+        return eff_map
+    return (sweep_efficiency,)
+
+
+@app.cell
+def _(np):
+    pr_values = np.arange(8, 26, 2)  # Pressure ratio from 8 to 24 step 2
+    t_inlet_values = np.arange(
+        1200, 1701, 50
+    )  # Turbine inlet temp from 1200 K to 1700 K step 50
+    return pr_values, t_inlet_values
+
+
+@app.cell
+def _(
+    P1_in,
+    T1_in,
+    eff_c_in,
+    eff_r_in,
+    eff_t_in,
+    fluid_in,
+    pr_values,
+    sweep_efficiency,
+    t_inlet_values,
+):
+    efficiency_map = sweep_efficiency(
+        pr_values,
+        t_inlet_values,
+        fluid_in,
+        eff_c_in,
+        eff_t_in,
+        eff_r_in,
+        T1_in,
+        P1_in,
+    )
+    return (efficiency_map,)
+
+
+@app.cell
+def _(efficiency_map, np, plt, pr_values, t_inlet_values):
+    # Plot 1: Efficiency vs Pressure Ratio (for selected turbine inlet temps)
+    plt.figure(figsize=(10, 6))
+    for idx, t_inlet in enumerate([1200, 1400, 1600, 1700]):
+        if t_inlet in t_inlet_values:
+            col_index = np.where(t_inlet_values == t_inlet)[0][0]
+            plt.plot(
+                pr_values,
+                efficiency_map[:, col_index],
+                marker="o",
+                label=f"Turbine inlet T = {t_inlet} K",
+            )
+    plt.xlabel("Compressor Pressure Ratio")
+    plt.ylabel("Thermal Efficiency (%)")
+    plt.title("Efficiency vs Compressor Pressure Ratio")
+    plt.grid(True)
+    plt.legend()
+    plt.tight_layout()
+    plt.show()
+    return
+
+
+@app.cell
+def _(efficiency_map, np, plt, pr_values, t_inlet_values):
+    # Plot 2: Efficiency vs Turbine Inlet Temperature (for selected pressure ratios)
+    plt.figure(figsize=(10, 6))
+    for pr_sel in [8, 14, 20, 24]:
+        if pr_sel in pr_values:
+            row_index = np.where(pr_values == pr_sel)[0][0]
+            plt.plot(
+                t_inlet_values,
+                efficiency_map[row_index, :],
+                marker="s",
+                label=f"Pressure Ratio = {pr_sel}",
+            )
+    plt.xlabel("Turbine Inlet Temperature (K)")
+    plt.ylabel("Thermal Efficiency (%)")
+    plt.title("Efficiency vs Turbine Inlet Temperature")
+    plt.grid(True)
+    plt.legend()
+    plt.tight_layout()
+    plt.show()
+    return
+
+
+@app.cell
+def _(efficiency_map, np, plt, pr_values, t_inlet_values):
+    # Plot 3: 2D Contour Map of Efficiency
+    plt.figure(figsize=(12, 8))
+    X, Y = np.meshgrid(t_inlet_values, pr_values)
+    contour = plt.contourf(X, Y, efficiency_map, levels=30, cmap="viridis")
+    plt.colorbar(contour, label="Thermal Efficiency (%)")
+    plt.xlabel("Turbine Inlet Temperature (K)")
+    plt.ylabel("Compressor Pressure Ratio")
+    plt.title("Thermal Efficiency Contour Map")
+    plt.tight_layout()
+    plt.show()
+    return
+
+
+@app.cell
+def _(CP, P0, T0, fluid_in):
+    def compute_physical_exergy(state, T0=T0, P0=P0):
+        """
+        Calculate physical exergy of a fluid state relative to environment.
+        ex = (h - h0) - T0*(s - s0)
+        """
+        h0 = CP.PropsSI("H", "T", T0, "P", P0, fluid_in)
+        s0 = CP.PropsSI("S", "T", T0, "P", P0, fluid_in)
+        exergy = (state["h"] - h0) - T0 * (state["s"] - s0)
+
+        return exergy
+    return (compute_physical_exergy,)
+
+
+@app.cell
+def _(compute_physical_exergy):
+    def exergy_analysis(cycle_results):
+        """
+        Perform exergy analysis given Brayton cycle results dictionary.
+
+        Returns:
+            dict with exergy destruction per component,
+            exergy efficiencies for components and whole cycle.
+        """
+        states = cycle_results["states"]
+
+        # Physical exergy of each state
+        ex = {k: compute_physical_exergy(v) for k, v in states.items()}
+
+        # Exergy destruction (irreversibility) in compressors
+        ex_dest_compressor1 = ex["1"] - ex["2a"]
+        ex_dest_compressor2 = ex["3"] - ex["4a"]
+        ex_dest_compressor_total = ex_dest_compressor1 + ex_dest_compressor2
+
+        # Exergy destruction in turbines
+        ex_dest_turbine1 = ex["5"] - ex["6a"]
+        ex_dest_turbine2 = ex["7"] - ex["8a"]
+        ex_dest_turbine_total = ex_dest_turbine1 + ex_dest_turbine2
+
+        # Exergy destruction in regenerator
+        ex_dest_regenerator = ex["8a"] - ex["9"]
+
+        # Net exergetic work output
+        w_net = cycle_results["metrics"]["w_net"]  # J/kg
+
+        # Total exergy input (fuel exergy)
+        ex_in = (
+            ex["9"] - ex["4a"]
+        )  # Exergy added via heat input (from regenerator to turbine inlet)
+
+        # Overall Second Law efficiency (exergetic efficiency)
+        eta_II = (w_net / ex_in) * 100  # in %
+
+        component_exergy_info = {
+            "Compressor 1 Exergy Destruction (kJ/kg)": ex_dest_compressor1 / 1000,
+            "Compressor 2 Exergy Destruction (kJ/kg)": ex_dest_compressor2 / 1000,
+            "Turbine 1 Exergy Destruction (kJ/kg)": ex_dest_turbine1 / 1000,
+            "Turbine 2 Exergy Destruction (kJ/kg)": ex_dest_turbine2 / 1000,
+            "Regenerator Exergy Destruction (kJ/kg)": ex_dest_regenerator / 1000,
+            "Total Compressor Exergy Destruction (kJ/kg)": ex_dest_compressor_total
+            / 1000,
+            "Total Turbine Exergy Destruction (kJ/kg)": ex_dest_turbine_total
+            / 1000,
+            "Cycle Second Law Efficiency (%)": eta_II,
+        }
+
+        return component_exergy_info
+    return (exergy_analysis,)
+
+
+@app.cell
+def _():
+    T0 = 298  # K, ambient temperature
+    P0 = 101325  # Pa, ambient pressure
+    return P0, T0
+
+
+@app.cell
+def _(
+    P1_in,
+    Pr_in,
+    T1_in,
+    T3_in,
+    brayton_cycle_analysis,
+    eff_c_in,
+    eff_r_in,
+    eff_t_in,
+    fluid_in,
+):
+    cycle_results = brayton_cycle_analysis(
+        T1_in,
+        P1_in,
+        Pr_in.value,
+        T3_in.value,
+        fluid_in,
+        eff_c_in,
+        eff_t_in,
+        eff_r_in,  # .value,
+    )
+    return (cycle_results,)
+
+
+@app.cell
+def _(cycle_results, exergy_analysis):
+    exergy_results = exergy_analysis(cycle_results)
+    return (exergy_results,)
+
+
+@app.cell
+def _(exergy_results, pd):
+    df_exergy = pd.DataFrame.from_dict(
+        exergy_results, orient="index", columns=["Value"]
+    )
+
+    df_exergy
     return
 
 
