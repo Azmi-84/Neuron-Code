@@ -8,7 +8,7 @@
 import marimo
 
 __generated_with = "0.15.2"
-app = marimo.App(width="full", auto_download=["html"])
+app = marimo.App(width="full")
 
 
 @app.cell(hide_code=True)
@@ -588,121 +588,19 @@ def _(efficiency_map, np, plt, pr_values, t_inlet_values):
 
 
 @app.cell
-def _(CP, P0, T0, fluid_in):
-    def compute_physical_exergy(state, T0=T0, P0=P0):
-        """
-        Calculate physical exergy of a fluid state relative to environment.
-        ex = (h - h0) - T0*(s - s0)
-        """
-        h0 = CP.PropsSI("H", "T", T0, "P", P0, fluid_in)
-        s0 = CP.PropsSI("S", "T", T0, "P", P0, fluid_in)
-        exergy = (state["h"] - h0) - T0 * (state["s"] - s0)
-
-        return exergy
-    return (compute_physical_exergy,)
-
-
-@app.cell
-def _(compute_physical_exergy):
-    def exergy_analysis(cycle_results):
-        """
-        Perform exergy analysis given Brayton cycle results dictionary.
-
-        Returns:
-            dict with exergy destruction per component,
-            exergy efficiencies for components and whole cycle.
-        """
-        states = cycle_results["states"]
-
-        # Physical exergy of each state
-        ex = {k: compute_physical_exergy(v) for k, v in states.items()}
-
-        # Exergy destruction (irreversibility) in compressors
-        ex_dest_compressor1 = ex["1"] - ex["2a"]
-        ex_dest_compressor2 = ex["3"] - ex["4a"]
-        ex_dest_compressor_total = ex_dest_compressor1 + ex_dest_compressor2
-
-        # Exergy destruction in turbines
-        ex_dest_turbine1 = ex["5"] - ex["6a"]
-        ex_dest_turbine2 = ex["7"] - ex["8a"]
-        ex_dest_turbine_total = ex_dest_turbine1 + ex_dest_turbine2
-
-        # Exergy destruction in regenerator
-        ex_dest_regenerator = ex["8a"] - ex["9"]
-
-        # Net exergetic work output
-        w_net = cycle_results["metrics"]["w_net"]  # J/kg
-
-        # Total exergy input (fuel exergy)
-        ex_in = (
-            ex["9"] - ex["4a"]
-        )  # Exergy added via heat input (from regenerator to turbine inlet)
-
-        # Overall Second Law efficiency (exergetic efficiency)
-        eta_II = (w_net / ex_in) * 100  # in %
-
-        component_exergy_info = {
-            "Compressor 1 Exergy Destruction (kJ/kg)": ex_dest_compressor1 / 1000,
-            "Compressor 2 Exergy Destruction (kJ/kg)": ex_dest_compressor2 / 1000,
-            "Turbine 1 Exergy Destruction (kJ/kg)": ex_dest_turbine1 / 1000,
-            "Turbine 2 Exergy Destruction (kJ/kg)": ex_dest_turbine2 / 1000,
-            "Regenerator Exergy Destruction (kJ/kg)": ex_dest_regenerator / 1000,
-            "Total Compressor Exergy Destruction (kJ/kg)": ex_dest_compressor_total
-            / 1000,
-            "Total Turbine Exergy Destruction (kJ/kg)": ex_dest_turbine_total
-            / 1000,
-            "Cycle Second Law Efficiency (%)": eta_II,
-        }
-
-        return component_exergy_info
-    return (exergy_analysis,)
-
-
-@app.cell
 def _():
-    T0 = 298  # K, ambient temperature
-    P0 = 101325  # Pa, ambient pressure
-    return P0, T0
+    T0 = 298
+    R = 0.287 * 1000
+    return R, T0
 
 
 @app.cell
-def _(
-    P1_in,
-    Pr_in,
-    T1_in,
-    T3_in,
-    brayton_cycle_analysis,
-    eff_c_in,
-    eff_r_in,
-    eff_t_in,
-    fluid_in,
-):
-    cycle_results = brayton_cycle_analysis(
-        T1_in,
-        P1_in,
-        Pr_in.value,
-        T3_in.value,
-        fluid_in,
-        eff_c_in,
-        eff_t_in,
-        eff_r_in,  # .value,
+def _(P1, P2, R, T0, analysis_results, math):
+    # Exergy analysis
+    states = analysis_results["states"]
+    exergy_destruction_compressor = T0(
+        states["2a"]["s"] - states["1"]["s"] - R * math.log(P2 / P1)
     )
-    return (cycle_results,)
-
-
-@app.cell
-def _(cycle_results, exergy_analysis):
-    exergy_results = exergy_analysis(cycle_results)
-    return (exergy_results,)
-
-
-@app.cell
-def _(exergy_results, pd):
-    df_exergy = pd.DataFrame.from_dict(
-        exergy_results, orient="index", columns=["Value"]
-    )
-
-    df_exergy
     return
 
 
