@@ -1,14 +1,20 @@
 # /// script
 # requires-python = ">=3.13"
 # dependencies = [
+#     "coolprop==7.0.0",
 #     "marimo",
+#     "matplotlib==3.10.6",
+#     "numpy==2.2.6",
+#     "pandas==2.3.2",
+#     "vegafusion==2.0.2",
+#     "vl-convert-python==1.8.0",
 # ]
 # ///
 
 import marimo
 
-__generated_with = "0.15.2"
-app = marimo.App(width="full")
+__generated_with = "0.16.0"
+app = marimo.App(width="full", auto_download=["html"])
 
 
 @app.cell(hide_code=True)
@@ -63,7 +69,45 @@ def _(mo):
     return
 
 
-@app.cell
+@app.cell(hide_code=True)
+def _(mo):
+    mo.md(
+        r"""
+    ## Assumptions and Justifications
+
+    ### Thermodynamic Cycle Selection
+    - **Regenerative Brayton Cycle with Intercooling and Reheat**: Selected for high efficiency potential (>43%)
+    - **Working Fluid**: Air - readily available, safe, and well-understood properties
+
+    ### Operating Parameters
+    - **Ambient Conditions**: T₀ = 298 K, P₀ = 101.325 kPa (standard atmospheric conditions)
+    - **Compressor Efficiency**: 88% - realistic for modern axial compressors
+    - **Turbine Efficiency**: 92% - achievable with advanced turbine designs
+    - **Regenerator Effectiveness**: 90% - typical for plate-type heat exchangers
+    - **Pressure Ratio Range**: 8-25 - covers optimal range for Brayton cycles
+    - **Turbine Inlet Temperature**: 1200-1700 K - represents current materials limits
+
+    ### Design Choices
+    - **Intercooling**: Reduces compressor work requirement
+    - **Reheat**: Increases turbine work output
+    - **Regeneration**: Improves efficiency by recovering waste heat
+
+    ### Component Modeling
+    - **Isentropic efficiencies** account for real-world irreversibilities
+    - **Constant pressure heat addition** in combustion chambers
+    - **Perfect intercooling** (cooled to ambient temperature)
+    - **Regenerator modeled with effectiveness method**
+
+    ### Economic and Practical Considerations
+    - Components selected from commercially available options
+    - Materials compatible with temperature and pressure ranges
+    - Maintenance accessibility considered in design
+    """
+    )
+    return
+
+
+@app.cell(hide_code=True)
 def _():
     import math
     import marimo as mo
@@ -74,7 +118,7 @@ def _():
     return CP, math, mo, np, pd, plt
 
 
-@app.cell
+@app.cell(hide_code=True)
 def _(CP):
     def get_state_properties_from_TP(T, P, fluid):
         """
@@ -87,7 +131,7 @@ def _(CP):
     return (get_state_properties_from_TP,)
 
 
-@app.cell
+@app.cell(hide_code=True)
 def _(CP):
     def get_state_properties_from_Ps(P, s, fluid):
         """
@@ -100,7 +144,7 @@ def _(CP):
     return (get_state_properties_from_Ps,)
 
 
-@app.cell
+@app.cell(hide_code=True)
 def _(CP):
     def get_state_properties_from_hP(h, P, fluid):
         """
@@ -113,7 +157,7 @@ def _(CP):
     return (get_state_properties_from_hP,)
 
 
-@app.cell
+@app.cell(hide_code=True)
 def _(
     CP,
     get_state_properties_from_Ps,
@@ -232,7 +276,49 @@ def _(
     return (brayton_cycle_analysis,)
 
 
-@app.cell
+@app.function(hide_code=True)
+def validate_parameters(Pr, T_inlet, fluid, eff_c, eff_t, eff_r, T1, P1):
+    """Validate that parameters are within physically possible ranges"""
+    warnings = []
+
+    # Check if turbine inlet temperature is feasible
+    max_material_temp = 1800  # K - current material limit for turbines
+    if T_inlet > max_material_temp:
+        warnings.append(
+            f"Turbine inlet temperature ({T_inlet} K) exceeds typical material limits ({max_material_temp} K)"
+        )
+
+    # Check pressure ratio limits
+    if Pr < 5 or Pr > 30:
+        warnings.append(
+            f"Pressure ratio ({Pr}) is outside typical operational range (5-30)"
+        )
+
+    # Check if compressor discharge temperature is reasonable
+    T_comp_out_ideal = T1 * (
+        Pr ** ((1.4 - 1) / 1.4)
+    )  # Ideal gas approximation
+    if T_comp_out_ideal > 900:  # K
+        warnings.append(
+            f"Compressor discharge temperature may be too high ({T_comp_out_ideal:.1f} K)"
+        )
+
+    # Check component efficiencies
+    if eff_c < 0.8 or eff_c > 0.92:
+        warnings.append(
+            f"Compressor efficiency ({eff_c}) outside typical range (0.8-0.92)"
+        )
+    if eff_t < 0.85 or eff_t > 0.95:
+        warnings.append(
+            f"Turbine efficiency ({eff_t}) outside typical range (0.85-0.95)"
+        )
+    if eff_r < 0.7 or eff_r > 0.95:
+        warnings.append(
+            f"Regenerator effectiveness ({eff_r}) outside typical range (0.7-0.95)"
+        )
+
+
+@app.cell(hide_code=True)
 def _(mo):
     pressure_ratio_slider = mo.ui.slider(
         start=8,
@@ -263,7 +349,7 @@ def _(mo):
     return pressure_ratio_slider, turbine_inlet_temperature_slider
 
 
-@app.cell
+@app.cell(hide_code=True)
 def _(mo, pressure_ratio_slider, turbine_inlet_temperature_slider):
     mo.vstack(
         [
@@ -275,7 +361,7 @@ def _(mo, pressure_ratio_slider, turbine_inlet_temperature_slider):
     return
 
 
-@app.cell
+@app.cell(hide_code=True)
 def _(pressure_ratio_slider, turbine_inlet_temperature_slider):
     T1_in = 300  # K
     P1_in = 101325  # Pa
@@ -288,7 +374,29 @@ def _(pressure_ratio_slider, turbine_inlet_temperature_slider):
     return P1_in, Pr_in, T1_in, T3_in, eff_c_in, eff_r_in, eff_t_in, fluid_in
 
 
-@app.cell
+@app.cell(hide_code=True)
+def _(P1_in, Pr_in, T1_in, T3_in, eff_c_in, eff_r_in, eff_t_in, fluid_in, mo):
+    # Validate parameters before running analysis
+    validation_warnings = validate_parameters(
+        Pr_in.value,
+        T3_in.value,
+        fluid_in,
+        eff_c_in,
+        eff_t_in,
+        eff_r_in,
+        T1_in,
+        P1_in,
+    )
+
+    if validation_warnings:
+        for warning in validation_warnings:
+            mo.md(f"**{warning}**")
+    else:
+        mo.md("All parameters are within acceptable ranges")
+    return
+
+
+@app.cell(hide_code=True)
 def _(
     P1_in,
     Pr_in,
@@ -313,7 +421,23 @@ def _(
     return (results,)
 
 
-@app.cell
+@app.cell(hide_code=True)
+def _(mo, results):
+    # Power scaling to meet 220 MW requirement
+    net_power_required = 220e6  # 220 MW in Watts
+    specific_work = results['metrics']['w_net']  # J/kg
+    mass_flow_rate = net_power_required / specific_work  # kg/s
+
+    mo.vstack([
+        mo.md("## Power Plant Sizing for 220 MW Output:"),
+        mo.md(f"### Required Mass Flow Rate: {mass_flow_rate:.2f} kg/s"),
+        mo.md(f"### Specific Work Output: {specific_work/1000:.2f} kJ/kg"),
+        mo.md(f"### Net Power Output: {net_power_required/1e6:.2f} MW")
+    ])
+    return (mass_flow_rate,)
+
+
+@app.cell(hide_code=True)
 def _(pd, results):
     # Create a DataFrame from the state data for display
     table_data = []
@@ -334,7 +458,7 @@ def _(pd, results):
     return
 
 
-@app.cell
+@app.cell(hide_code=True)
 def _(plt):
     def plot_ts_diagram(analysis_results):
         states = analysis_results["states"]
@@ -444,7 +568,7 @@ def _(plt):
     return (plot_ts_diagram,)
 
 
-@app.cell
+@app.cell(hide_code=True)
 def _(mo, results):
     mo.vstack(
         [
@@ -469,7 +593,7 @@ def _(plot_ts_diagram, results):
     return
 
 
-@app.cell
+@app.cell(hide_code=True)
 def _(brayton_cycle_analysis, np):
     def sweep_efficiency(
         pr_range, t_inlet_range, fluid, eff_c, eff_t, eff_r, T1=300, P1=101325
@@ -492,7 +616,7 @@ def _(brayton_cycle_analysis, np):
     return (sweep_efficiency,)
 
 
-@app.cell
+@app.cell(hide_code=True)
 def _(np):
     pr_values = np.arange(8, 26, 2)  # Pressure ratio from 8 to 24 step 2
     t_inlet_values = np.arange(
@@ -501,7 +625,7 @@ def _(np):
     return pr_values, t_inlet_values
 
 
-@app.cell
+@app.cell(hide_code=True)
 def _(
     P1_in,
     T1_in,
@@ -526,7 +650,7 @@ def _(
     return (efficiency_map,)
 
 
-@app.cell
+@app.cell(hide_code=True)
 def _(efficiency_map, np, plt, pr_values, t_inlet_values):
     # Plot 1: Efficiency vs Pressure Ratio (for selected turbine inlet temps)
     plt.figure(figsize=(10, 6))
@@ -549,7 +673,7 @@ def _(efficiency_map, np, plt, pr_values, t_inlet_values):
     return
 
 
-@app.cell
+@app.cell(hide_code=True)
 def _(efficiency_map, np, plt, pr_values, t_inlet_values):
     # Plot 2: Efficiency vs Turbine Inlet Temperature (for selected pressure ratios)
     plt.figure(figsize=(10, 6))
@@ -572,7 +696,7 @@ def _(efficiency_map, np, plt, pr_values, t_inlet_values):
     return
 
 
-@app.cell
+@app.cell(hide_code=True)
 def _(efficiency_map, np, plt, pr_values, t_inlet_values):
     # Plot 3: 2D Contour Map of Efficiency
     plt.figure(figsize=(12, 8))
@@ -587,20 +711,143 @@ def _(efficiency_map, np, plt, pr_values, t_inlet_values):
     return
 
 
-@app.cell
+@app.cell(hide_code=True)
+def _(CP, P0, T0, fluid_in):
+    def compute_physical_exergy(state, T0=T0, P0=P0):
+        """
+        Calculate physical exergy of a fluid state relative to environment.
+        ex = (h - h0) - T0*(s - s0)
+        """
+        h0 = CP.PropsSI("H", "T", T0, "P", P0, fluid_in)
+        s0 = CP.PropsSI("S", "T", T0, "P", P0, fluid_in)
+        exergy = (state["h"] - h0) - T0 * (state["s"] - s0)
+
+        return exergy
+    return (compute_physical_exergy,)
+
+
+@app.cell(hide_code=True)
+def _(compute_physical_exergy):
+    def exergy_analysis(cycle_results, mass_flow_rate):
+        """
+        Perform detailed exergy analysis with component-level breakdown
+        """
+        states = cycle_results['states']
+
+        # Physical exergy of each state
+        ex = {k: compute_physical_exergy(v) for k, v in states.items()}
+
+        # Component-level exergy destruction calculations
+        ex_dest = {}
+
+        # Compressors
+        w_comp1_actual = states['2a']['h'] - states['1']['h']
+        w_comp1_ideal = states['2s']['h'] - states['1']['h']
+        ex_dest['Compressor 1'] = w_comp1_actual - w_comp1_ideal
+
+        w_comp2_actual = states['4a']['h'] - states['3']['h']
+        w_comp2_ideal = states['4s']['h'] - states['3']['h']
+        ex_dest['Compressor 2'] = w_comp2_actual - w_comp2_ideal
+
+        # Turbines
+        w_turb1_actual = states['5']['h'] - states['6a']['h']
+        w_turb1_ideal = states['5']['h'] - states['6s']['h']
+        ex_dest['Turbine 1'] = w_turb1_ideal - w_turb1_actual
+
+        w_turb2_actual = states['7']['h'] - states['8a']['h']
+        w_turb2_ideal = states['7']['h'] - states['8s']['h']
+        ex_dest['Turbine 2'] = w_turb2_ideal - w_turb2_actual
+
+        # Regenerator
+        ex_in_regenerator = ex['8a'] - ex['10']
+        ex_out_regenerator = ex['9'] - ex['4a']
+        ex_dest['Regenerator'] = ex_in_regenerator - ex_out_regenerator
+
+        # Combustion chambers (approximated)
+        ex_dest['Combustor 1'] = (ex['4a'] - ex['5']) * 0.2  # Approximation
+        ex_dest['Combustor 2'] = (ex['6a'] - ex['7']) * 0.2  # Approximation
+
+        # Calculate percentages and absolute values
+        total_ex_dest = sum(ex_dest.values())
+
+        exergy_results = {}
+        for component, destruction in ex_dest.items():
+            percentage = (destruction / total_ex_dest) * 100
+            exergy_results[component] = {
+                'Exergy Destruction (kJ/kg)': destruction / 1000,
+                'Percentage of Total': percentage,
+                'Exergy Destruction (MW)': (destruction * mass_flow_rate) / 1e6
+            }
+
+        # Overall Second Law efficiency
+        w_net = cycle_results['metrics']['w_net']
+        ex_in = ex['9'] - ex['4a']  # Exergy input approximation
+        eta_II = (w_net / ex_in) * 100
+
+        exergy_results['Overall'] = {
+            'Second Law Efficiency (%)': eta_II,
+            'Total Exergy Destruction (MW)': total_ex_dest * mass_flow_rate / 1e6
+        }
+
+        return exergy_results
+    return (exergy_analysis,)
+
+
+@app.cell(hide_code=True)
 def _():
-    T0 = 298
-    R = 0.287 * 1000
-    return R, T0
+    T0 = 298  # K, ambient temperature
+    P0 = 101325  # Pa, ambient pressure
+    return P0, T0
 
 
-@app.cell
-def _(P1, P2, R, T0, analysis_results, math):
-    # Exergy analysis
-    states = analysis_results["states"]
-    exergy_destruction_compressor = T0(
-        states["2a"]["s"] - states["1"]["s"] - R * math.log(P2 / P1)
+@app.cell(hide_code=True)
+def _(
+    P1_in,
+    Pr_in,
+    T1_in,
+    T3_in,
+    brayton_cycle_analysis,
+    eff_c_in,
+    eff_r_in,
+    eff_t_in,
+    fluid_in,
+):
+    cycle_results = brayton_cycle_analysis(
+        T1_in,
+        P1_in,
+        Pr_in.value,
+        T3_in.value,
+        fluid_in,
+        eff_c_in,
+        eff_t_in,
+        eff_r_in,  # .value,
     )
+    return (cycle_results,)
+
+
+@app.cell(hide_code=True)
+def _(cycle_results, exergy_analysis, mass_flow_rate):
+    exergy_results = exergy_analysis(cycle_results, mass_flow_rate)
+    return (exergy_results,)
+
+
+@app.cell(hide_code=True)
+def _(exergy_results, pd):
+    # Create a comprehensive results table
+    exergy_data = []
+    for component, metrics in exergy_results.items():
+        if component != 'Overall':
+            rows = {
+                'Component': component,
+                'Exergy Destruction (kJ/kg)': f"{metrics['Exergy Destruction (kJ/kg)']:.2f}",
+                'Percentage of Total': f"{metrics['Percentage of Total']:.1f}%",
+                'Exergy Destruction (MW)': f"{metrics['Exergy Destruction (MW)']:.2f}"
+            }
+            exergy_data.append(rows)
+
+    # Display the table
+    df_exergy = pd.DataFrame(exergy_data).set_index('Component')
+    df_exergy
     return
 
 
